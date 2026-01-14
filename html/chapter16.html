@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 16 章：应用专题 II：BEV 矢量地图与系统落地（SVG × Map/Driving）</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter10.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 10 章：现代 SVG 工作谱系综述：StarVector、OmniSVG、InternSVG 等</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter13.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 13 章：评测体系：像素、结构、语义与可编辑性</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter14.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 14 章：SVG Animation：时间维度、交互与可控运动生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter15.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter16.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 16 章：应用专题 II：BEV 矢量地图与系统落地（SVG × Map/Driving）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="16-iibev-svg-mapdriving">第 16 章：应用专题 II：BEV 矢量地图与系统落地（SVG × Map/Driving）</h1>
+<h2 id="1">1. 开篇段落</h2>
+<p>欢迎来到《SVG-MLLM》教程的终章。如果说前面的章节是关于“教 AI 像艺术家一样绘画”，那么本章则是“教 AI 像工程师一样测绘”。在自动驾驶（AD）领域，<strong>高精地图（HD Map）</strong> 是车辆理解世界的基石。然而，传统的地图构建依赖昂贵的人力标注或复杂的激光雷达管线。近年来，<strong>在线矢量化感知（Online Vectorized Perception）</strong> 成为主流——即让模型看一眼摄像头画面，直接输出车道线、路沿和交通要素的矢量结构。</p>
+<p>这与我们的 SVG-MLLM 任务惊人地契合：<strong>输入是图像，输出是结构化的矢量文本</strong>。本章将深入探讨如何将 SVG 作为高精地图的通用中间表征（Intermediate Representation），利用 MLLM 强大的序列建模能力，解决传统方法难以处理的<strong>拓扑连接推理</strong>和<strong>复杂场景理解</strong>问题。我们将揭示 SVG 如何从一种“图形格式”升维为“物理世界的语义描述语言”。</p>
+<h2 id="2">2. 核心技术论述</h2>
+<h3 id="161-svg-hd-map">16.1 重新定义地图：SVG 语义与 HD Map 元素的同构映射</h3>
+<p>自动驾驶地图（HD Map）与导航地图不同，它要求厘米级精度和丰富的语义。我们可以建立一套严密的映射体系，将地图要素转化为 SVG 语法：</p>
+<ol>
+<li>
+<p><strong>几何层（Geometry）：</strong></p>
+<ul>
+<li><strong>车道中心线（Centerlines）</strong>：映射为 <code>&lt;path fill="none" stroke="..." /&gt;</code>。这是用于规划的核心轨迹。</li>
+<li><strong>车道边界（Dividers/Boundaries）</strong>：映射为 <code>&lt;polyline&gt;</code> 或 <code>&lt;path&gt;</code>。区分实线、虚线、双黄线。</li>
+<li><strong>人行横道（Crosswalks）</strong>：映射为闭合的 <code>&lt;polygon&gt;</code> 或带填充的 <code>&lt;path&gt;</code>。</li>
+<li><strong>路沿（Curbs）</strong>：映射为不闭合的 <code>&lt;path&gt;</code>，通常作为可行驶区域的物理边界。</li>
+</ul>
+</li>
+<li>
+<p><strong>语义属性层（Attributes）：</strong></p>
+<ul>
+<li>SVG 的强大之处在于其 XML 属性可扩展性。我们不再仅仅依赖颜色区分，而是显式编码：</li>
+<li><code>&lt;path class="lane-divider" data-type="double-yellow" data-passable="false" ... /&gt;</code></li>
+<li>这使得下游控制模块无需进行图像处理，直接解析 XML 属性即可获知“不可跨越”。</li>
+</ul>
+</li>
+<li>
+<p><strong>拓扑层（Topology as Hyperlinks）：</strong></p>
+<ul>
+<li>地图最难的部分是<strong>连接关系</strong>（哪条路连着哪条路）。传统方法需要输出邻接矩阵。</li>
+<li>在 SVG 中，我们利用 <code>id</code> 和引用机制实现“图”结构：</li>
+<li><code>&lt;path id="lane_123" d="..." data-successors="lane_456, lane_789" /&gt;</code></li>
+<li>这种设计让 MLLM 可以通过文本生成的自然逻辑（先定义节点，再定义引用）来隐式学习复杂的路口拓扑。</li>
+</ul>
+</li>
+</ol>
+<h3 id="162-svg">16.2 坐标系工程：从地理世界到 SVG 画布</h3>
+<p>这是本章最大的工程难点。自动驾驶涉及三个核心坐标系，必须在数据预处理阶段理清：</p>
+<ul>
+<li><strong>世界坐标系 (UTM/WGS84)</strong>：地球上的绝对位置。</li>
+<li><strong>自车坐标系 (Ego-Coordinate)</strong>：以车辆后轴中心为原点 (0,0)，X轴向前，Y轴向左（右手系）。</li>
+<li><strong>SVG 画布坐标系</strong>：原点通常在左上角，X轴向右，Y轴向下（屏幕坐标系）。</li>
+</ul>
+<p><strong>Rule of Thumb（黄金法则）：构建“规范化 BEV 空间”</strong></p>
+<blockquote>
+<p>不要在 SVG 中直接存储经纬度（数值过大，导致 Token 爆炸且精度丢失）。
+<strong>最佳实践</strong>：定义一个以自车为中心的局部矩形区域（例如：前后 60米，左右 30米）。</p>
+<ol>
+<li><strong>归一化</strong>：将 [-30m, 30m] 映射到 SVG 的 [0, 1024] 坐标空间。</li>
+<li><strong>翻转与平移</strong>：必须在 SVG Header 中写入变换矩阵，或者在生成数据时预先翻转 Y 轴，确保 SVG 渲染出的图像与 BEV 鸟瞰图方向一致（车头朝上）。</li>
+<li><strong>量化</strong>：将浮点数坐标量化为整数 Token（如 <code>&lt;pt_512&gt;</code>），既节省上下文长度，又利用了 Transformer 对离散 Token 的分类优势。</li>
+</ol>
+</blockquote>
+<h3 id="163-i-perception-to-vector">16.3 任务范式 I：在线感知生成 (Perception-to-Vector)</h3>
+<p>利用 MLLM 实现 MapTR (Map Transformer) 类任务的流程：</p>
+<ol>
+<li><strong>输入端</strong>：多视角环视图像（Front, Back, Left, Right 等 6 张图）通过 CNN/ViT 提取特征，利用 IPM（逆透视映射）或 Cross-Attention 融合为 BEV 特征 embedding。</li>
+<li><strong>桥接层</strong>：将 BEV 特征作为 MLLM 的视觉 Prompt（类似于看图说话）。</li>
+<li><strong>指令</strong>：<code>User: "Generate a vectorized lane graph for the current scene, ensuring topology connectivity."</code></li>
+<li><strong>输出端</strong>：模型自回归生成 SVG 文本。<ul>
+<li><em>优势</em>：传统回归模型很难处理“车道线数量不固定”的问题（需要 Padding 或匈牙利匹配）。MLLM 只需要像写句子一样，一条接一条地写 <code>&lt;path&gt;</code>，直到输出 <code>&lt;/svg&gt;</code> 结束符，天然适应开集数量。</li>
+</ul>
+</li>
+</ol>
+<h3 id="164-ii-inpainting-reasoning">16.4 任务范式 II：地图补全与推理 (Inpainting &amp; Reasoning)</h3>
+<p>这体现了“理解”与“生成”的一体化：</p>
+<ul>
+<li><strong>遮挡补全</strong>：当一辆大卡车挡住了路口，纯视觉感知会断裂。MLLM 基于学习到的道路先验（“路口的车道线通常是对齐的”），可以在 SVG 中生成被遮挡部分的虚构坐标，完成逻辑闭环。</li>
+<li><strong>文本驱动的地图修改</strong>：<ul>
+<li>输入：当前地图 SVG + 文本指令 "Add a construction zone barrier on the right lane."</li>
+<li>输出：模型在右侧车道对应位置插入一个新的 <code>&lt;rect class="obstacle" ... /&gt;</code> 并修改对应车道的 <code>data-passable="false"</code> 属性。</li>
+</ul>
+</li>
+</ul>
+<h3 id="165-svg">16.5 渲染与应用落地：SVG 的全栈价值</h3>
+<p>在系统落地环节，SVG 提供了无可比拟的工程便利性：</p>
+<ol>
+<li>
+<p><strong>Web 前端可视化（无需 ROS）</strong>：</p>
+<ul>
+<li>传统的调试需要安装 Rviz 等重型软件。</li>
+<li>SVG 方案下，感知输出的只是一个字符串。任何浏览器都可以直接渲染，甚至可以在手机上远程监控车辆的感知结果。</li>
+<li><strong>Diff 可视化</strong>：将 Ground Truth 设为绿色层，预测结果设为红色半透明层，叠加在一起，工程师可以瞬间看出感知偏差。</li>
+</ul>
+</li>
+<li>
+<p><strong>Three.js / 3D 仿真联动</strong>：</p>
+<ul>
+<li>BEV 地图是 2D 的，但世界是 3D 的。</li>
+<li>利用 <code>SVGLoader</code> 解析 SVG 路径，使用 <code>ExtrudeGeometry</code> 将车道线“挤出”厚度，将 <code>&lt;polygon&gt;</code> 转化为路面网格（Mesh）。</li>
+<li>这样可以快速从感知结果生成一个轻量级的 3D 仿真场景（Simulator Scenario），用于规划算法的回归测试。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="3">3. 本章小结</h2>
+<p>本章完成了从“图形学”到“机器人学”的跨越。关键点如下：</p>
+<ul>
+<li><strong>数据结构</strong>：HD Map 的车道、路沿、拓扑关系可以完美映射为 SVG 的 Path、Polygon 和属性引用机制。</li>
+<li><strong>坐标哲学</strong>：必须建立“物理世界 (米) ↔ Token 空间 (整数)”的严格双向映射，并处理好坐标系手性翻转。</li>
+<li><strong>模型优势</strong>：相比传统的坐标回归头，SVG-MLLM 提供了变长序列生成能力和显式的拓扑描述能力。</li>
+<li><strong>工程红利</strong>：SVG 格式打通了感知端（Python/C++）、可视化端（Web/JS）和仿真端（3D Engine），大幅降低了自动驾驶工具链的开发成本。</li>
+</ul>
+<hr />
+<h2 id="4">4. 练习题</h2>
+<h3 id="_1">基础题（熟悉材料）</h3>
+<ol>
+<li>
+<p><strong>坐标转换实战</strong>：假设自车坐标系中点 $P_{car} = (10m, -5m)$（前方10米，左方5米）。我们定义 BEV 范围为前后 100m，左右 50m，映射到 $512 \times 512$ 的 SVG 画布上。请计算该点在 SVG 中的像素坐标 $(x, y)$。（假设 SVG 原点在左上角，X向右，Y向下）。
+    <details markdown="1">
+    <summary>Hint</summary>
+    注意 Y 轴方向的翻转和原点平移。
+    </details></p>
+</li>
+<li>
+<p><strong>属性设计</strong>：如果你需要用 SVG 描述一条“限速 60km/h，仅允许公交车通行”的车道，你会如何设计 <code>&lt;path&gt;</code> 标签的属性？请写出 XML 代码片段。
+    <details markdown="1">
+    <summary>Hint</summary>
+    使用 data-* 自定义属性。
+    </details></p>
+</li>
+<li>
+<p><strong>元素选择</strong>：在 BEV 地图中，路口的“停止线（Stop Line）”应该用 <code>&lt;line&gt;</code>、<code>&lt;rect&gt;</code> 还是 <code>&lt;path&gt;</code> 表示？为什么？
+    <details markdown="1">
+    <summary>Hint</summary>
+    考虑停止线通常是有一定宽度的实体，还是只是逻辑上的一条线。
+    </details></p>
+</li>
+</ol>
+<h3 id="_2">挑战题（深度思考）</h3>
+<ol start="4">
+<li>
+<p><strong>拓扑生成策略</strong>：在 MLLM 生成 SVG 时，是应该先生成所有车道的 <code>&lt;path&gt;</code> 几何形状，最后统一生成拓扑引用（如 <code>&lt;g id="topology"&gt;...&lt;/g&gt;</code>），还是应该在每条 <code>&lt;path&gt;</code> 内部直接生成 <code>data-next-lane="..."</code>？分析这两种 Token 顺序对模型推理难度的影响。
+    <details markdown="1">
+    <summary>Hint</summary>
+    类似于编程语言中的“前向声明”问题。如果引用了还未生成的 ID，模型需要具备规划能力。
+    </details></p>
+</li>
+<li>
+<p><strong>抗噪设计</strong>：感知模型输出的 SVG 可能会有抖动（例如直线变成了微小的波浪线）。设计一个基于 SVG 指令的后处理算法（不转化为光栅图），将这些波浪线“拉直”。
+    <details markdown="1">
+    <summary>Hint</summary>
+    Ramer-Douglas-Peucker (RDP) 算法在 SVG <code>d</code> 属性上的应用。
+    </details></p>
+</li>
+<li>
+<p><strong>多模态对齐</strong>：如何设计一个 Loss 函数，既能监督 SVG 的几何位置（车道线画得准不准），又能监督 SVG 的语义属性（是不是画成了公交专用道）？
+    <details markdown="1">
+    <summary>Hint</summary>
+    结合 Set Prediction Loss (如 DETR 的匈牙利匹配) 和 Cross-Entropy Loss。几何部分通常需要点集采样距离（Chamfer Distance）。
+    </details></p>
+</li>
+</ol>
+<hr />
+<h2 id="5-gotchas">5. 常见陷阱与错误 (Gotchas)</h2>
+<h3 id="51-hallucination">5.1 "幽灵车道"与幻觉 (Hallucination)</h3>
+<ul>
+<li><strong>现象</strong>：模型在没有任何视觉线索的空地上，非常自信地画出了一条完美的车道线 SVG。</li>
+<li><strong>原因</strong>：MLLM 的语言模型特性使其倾向于补全合理的模式（Pattern Completion）。训练集中如果包含大量规则路口，模型可能会“脑补”出缺失的线条。</li>
+<li><strong>对策</strong>：引入<strong>置信度属性</strong>。训练模型输出 <code>&lt;path confidence="0.8" ... /&gt;</code>。在推理后，过滤掉低置信度的 SVG 元素。或者使用 RAG（检索增强），检索当前路段的历史地图作为 Context。</li>
+</ul>
+<h3 id="52">5.2 贝塞尔曲线的“过拟合”</h3>
+<ul>
+<li><strong>现象</strong>：用三次贝塞尔曲线（C 指令）拟合直道时，控制点跑到了很远的地方，导致渲染出的线是直的，但计算几何距离时出现巨大误差。</li>
+<li><strong>原因</strong>：多解问题。一条直线可以用无数种控制点组合来表示。</li>
+<li><strong>对策</strong>：在数据规范化（Canonicalization）阶段，强制将直线段转换为 <code>L</code> 指令，仅在曲率超过阈值时使用 <code>C</code> / <code>Q</code> 指令。限制控制点必须在起终点的包围盒（Bounding Box）附近。</li>
+</ul>
+<h3 id="53-sequence-length-explosion">5.3 序列过长 (Sequence Length Explosion)</h3>
+<ul>
+<li><strong>现象</strong>：复杂的路口包含数十条车道，生成的 SVG 文本长度超过了 LLM 的上下文窗口（如 4096 tokens），导致 SVG 被截断，无法解析。</li>
+<li><strong>原因</strong>：浮点数坐标占用太多字符（如 <code>M 102.45 33.12</code>）。</li>
+<li><strong>对策</strong>：<ol>
+<li><strong>坐标量化 Token</strong>：使用 <code>&lt;x_102&gt;&lt;y_33&gt;</code> 代替文本数字。</li>
+<li><strong>分层生成</strong>：先生成粗粒度的拓扑结构（Graph），再对每一条边（Edge）单独调用 Decoder 生成细粒度的几何点（Refinement）。</li>
+</ol>
+</li>
+</ul>
+<h3 id="54-handedness-error">5.4 坐标系手性错误 (Handedness Error)</h3>
+<ul>
+<li><strong>现象</strong>：车道线左右位置正确，但转弯方向反了（左转变右转）。</li>
+<li><strong>原因</strong>：这是最隐蔽的错误。通常是因为世界坐标系（右手系）转到图像坐标系（左手系/屏幕系）时，只翻转了 Y 轴，却忘记了叉乘方向的变化。</li>
+<li><strong>调试技巧</strong>：始终在你的 SVG 可视化工具中，绘制一个非对称的“F”字符作为基准锚点。如果“F”变反了，说明整个坐标变换链条有误。</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter15.html" class="nav-link prev">← 第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography)</a><a href="CLAUDE.html" class="nav-link next">Untitled →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography)</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter10.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 10 章：现代 SVG 工作谱系综述：StarVector、OmniSVG、InternSVG 等</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter13.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 13 章：评测体系：像素、结构、语义与可编辑性</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter14.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 14 章：SVG Animation：时间维度、交互与可控运动生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter15.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter16.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 16 章：应用专题 II：BEV 矢量地图与系统落地（SVG × Map/Driving）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="15-i-svg-typography">第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography)</h1>
+<h2 id="151">15.1 开篇：从“看图说话”到“造字工匠”</h2>
+<p>在前面的章节中，我们训练模型生成的图标或插画通常容忍一定的变形（比如一个苹果画得稍微扁一点并不影响辨识）。然而，<strong>字体（Typography）</strong>是矢量生成领域中最为严苛的挑战。</p>
+<p>字形（Glyph）不仅要求极高的<strong>几何精度</strong>（曲线必须光顺、G2 连续），还受到严格的<strong>拓扑约束</strong>（如‘B’必须有两个封闭的内部孔洞）和<strong>风格一致性</strong>（整套字库的 26 个字母、数字、标点符号必须看起来属于同一个视觉家族）。</p>
+<p>此外，字体不仅仅是图形，它是<strong>软件</strong>。一个生成的 SVG 字符如果不能被打包成 <code>.ttf</code> 或 <code>.otf</code> 文件并在文本编辑器中打出来，它的价值就大打折扣。本章将系统讲解如何让 SVG-MLLM 跨越从“画图”到“造字”的鸿沟。</p>
+<p><strong>本章学习目标</strong>：</p>
+<ol>
+<li><strong>解剖字形</strong>：理解 Glyph 在 SVG path 中的微观几何（轮廓方向、EM Square、积分点）。</li>
+<li><strong>生成任务</strong>：掌握字库补全（Few-shot style transfer）与可变字体插值（Interpolation）。</li>
+<li><strong>几何约束</strong>：学习处理字体特有的约束——极值点对齐、过冲（Overshoot）与光学校正。</li>
+<li><strong>工程闭环</strong>：了解从模型输出的 SVG path 到工业级字体文件（OpenType/TrueType）的转换链路。</li>
+</ol>
+<hr />
+<h2 id="152-svg">15.2 字体的微观几何：当 SVG 遇上排版学</h2>
+<h3 id="1521-em-square-svg-viewbox">15.2.1 坐标系：EM Square 与 SVG ViewBox</h3>
+<p>标准的字体设计是在一个被称为 <strong>EM Square</strong>（EM 框）的虚拟方格中进行的。常见的单位是 1000 或 2048。</p>
+<ul>
+<li><strong>字体坐标系</strong>：通常 Cartesian 坐标系（Y 轴向上）。</li>
+<li><strong>SVG 坐标系</strong>：屏幕坐标系（Y 轴向下）。</li>
+<li><strong>转换</strong>：在训练 SVG-MLLM 时，必须统一坐标系。通常建议将字体数据预处理翻转 Y 轴，归一化到 <code>[0, 1]</code> 或 <code>[0, 1024]</code> 的 viewBox 中。</li>
+</ul>
+<h3 id="1522-anatomy-of-type">15.2.2 字形解剖学 (Anatomy of Type)</h3>
+<p>模型需要理解的不仅是像素，而是笔画的结构。</p>
+<div class="codehilite"><pre><span></span><code>       (Ascender Line / 上升部)  -------- h, k, l, b, d
+                                     |
+           (Cap Line / 大写高度)  -------- H, E, A, T
+                                     |
+             (Mean Line / 中线)  -------- x, a, c, e, o (x-height)
+                                     |
+              (Baseline / 基线)  -------- 所有字母的“脚”踩在这里
+                                     |
+      (Descender Line / 下降部)  -------- p, q, y, g, j
+</code></pre></div>
+
+<blockquote>
+<p><strong>Rule of Thumb 15.1：视觉对齐 &gt; 几何对齐</strong>
+在字体设计中，圆形字母（如 O, C）的高度在数学上必须<strong>略大于</strong>方形字母（如 H, E）的高度，这种现象叫 <strong>Overshoot（过冲）</strong>。如果模型生成的 'O' 和 'H' 数学高度完全一样，人眼会觉得 'O' 看起来偏小。<strong>训练数据必须保留这种微小的几何偏差，不要强行 Normalize 到同一高度。</strong></p>
+</blockquote>
+<h3 id="1523-quadratic-vs-cubic">15.2.3 贝塞尔曲线的“方言”：Quadratic vs Cubic</h3>
+<p>SVG 标准主要使用<strong>三次贝塞尔曲线</strong>（Cubic Bezier, <code>C</code> 命令），有两个控制点。而广泛使用的 TrueType (.ttf) 格式主要使用<strong>二次贝塞尔曲线</strong>（Quadratic Bezier, <code>Q</code> 命令），只有一个控制点。</p>
+<ul>
+<li><strong>模型选择</strong>：建议 MLLM 输出 <strong>Cubic (SVG <code>C</code>)</strong>。因为三次曲线表达能力更强，能够用更少的点描述复杂形状。</li>
+<li><strong>后处理</strong>：如果目标是生成 .ttf 文件，需要在后处理阶段将 <code>C</code> 命令数学拟合转化为多个 <code>Q</code> 命令（通常会有约 1.5 倍的点数膨胀）。</li>
+</ul>
+<hr />
+<h2 id="153-i">15.3 核心任务 I：字库补全与风格迁移</h2>
+<p>这是 SVG-MLLM 在字体领域最主要的应用场景。设计一套字体需要绘制数千个字符，工作量巨大。我们希望 AI 能充当“助手”。</p>
+<h3 id="1531">15.3.1 任务定义</h3>
+<p><strong>Few-shot Glyph Generation</strong>：</p>
+<ul>
+<li><strong>输入</strong>：用户提供的参考字符 SVG（例如 "H", "O", "n"）。</li>
+<li><strong>指令</strong>：<code>"基于参考风格，生成字母 'a', 'b', 'c'..."</code></li>
+<li><strong>输出</strong>：符合参考风格的目标字符 SVG 代码。</li>
+</ul>
+<h3 id="1532">15.3.2 风格特征解耦</h3>
+<p>模型需要学习将字形解耦为 <strong>Content（骨架拓扑）</strong> 和 <strong>Style（笔触特征）</strong>。</p>
+<ul>
+<li><strong>Serif (衬线)</strong>：笔画末端的装饰（如 Times New Roman）。</li>
+<li><strong>Weight (字重)</strong>：笔画的粗细。</li>
+<li><strong>Contrast (粗细对比)</strong>：竖笔和横笔的粗细比例。</li>
+<li><strong>Terminal (收尾)</strong>：笔画结束是切平的、圆头的还是泪滴状的。</li>
+</ul>
+<h3 id="1533">15.3.3 难点：结构一致性</h3>
+<p>如果参考样本是“手写体”，生成的字符也必须带有手写特征（抖动、不规则）；如果参考是“黑体”，生成的线条必须绝对横平竖直。</p>
+<ul>
+<li><strong>Gotcha</strong>：模型容易在生成复杂字符（如 '&amp;', 'g', 'Q'）时“偷懒”，简化掉风格特征。需要使用判别器（Discriminator）或风格一致性 Loss 来监督。</li>
+</ul>
+<hr />
+<h2 id="154-ii-variable-fonts">15.4 核心任务 II：可变字体与插值 (Variable Fonts)</h2>
+<p>SVG 的参数化特性使得它天然适合做<strong>插值（Interpolation）</strong>。</p>
+<h3 id="1541-weight-interpolation">15.4.1 字重插值 (Weight Interpolation)</h3>
+<p>从 Regular 到 Bold。这不仅是把线变粗，而是骨架的移动。</p>
+<ul>
+<li>
+<p><strong>技术前提：点对应 (Point Correspondence)</strong>。
+    要实现完美的 SVG 动画或字体插值，起始形状（Regular）和目标形状（Bold）必须拥有<strong>完全相同数量的指令和点</strong>，且顺序一致。</p>
+</li>
+<li>
+<p><strong>MLLM 的挑战</strong>：直接生成两个不同字重的 SVG，通常点数对不上。</p>
+</li>
+<li><strong>解决方案</strong>：<ol>
+<li><strong>Master Generation</strong>：让模型只生成最细（Thin）和最粗（Black）两个极端母版。</li>
+<li><strong>Structure Matching</strong>：使用传统算法（如基于匈牙利算法的点匹配）强制对齐两个母版的拓扑。</li>
+<li><strong>Interpolation</strong>：在中间线性插值生成 Regular, Medium, Bold。</li>
+</ol>
+</li>
+</ul>
+<hr />
+<h2 id="155">15.5 拓扑与填充规则：黑洞问题</h2>
+<p>在 SVG 字体中，最常见的错误是<strong>填充规则（Fill Rule）</strong>导致的渲染错误。</p>
+<h3 id="1551-winding-rules">15.5.1 Winding Rules (缠绕规则)</h3>
+<ul>
+<li><strong>Non-zero Rule</strong>（SVG 默认）：通过判断射线与路径相交的方向计数。要求<strong>外轮廓和内轮廓绘制方向相反</strong>。<ul>
+<li>例如：字母 'O'，外圈顺时针，内圈必须逆时针。</li>
+</ul>
+</li>
+<li><strong>Even-odd Rule</strong>：只计算射线穿过的路径数量，奇数为实，偶数为虚。<strong>不依赖方向</strong>。</li>
+</ul>
+<h3 id="1552">15.5.2 模型的困境与对策</h3>
+<p>大模型很难凭空学会“顺时针/逆时针”的隐式数学规律，经常生成方向相同的内外圈，导致字母中间的洞被填黑（Black Hole Artifacts）。</p>
+<blockquote>
+<p><strong>Rule of Thumb 15.2：显式优于隐式</strong></p>
+<ol>
+<li><strong>数据清洗</strong>：在训练前，统一使用图形学库（如 <code>Skia</code> 或 <code>Shapely</code>）将所有训练数据标准化为 <code>fill-rule="nonzero"</code> 且方向正确的格式（外逆内顺）。</li>
+<li><strong>Prompt 引导</strong>：如果支持，可以在 System Prompt 中加入 "Ensure inner paths (counter shapes) have opposite winding direction to outer paths."</li>
+<li><strong>保底策略</strong>：在推理输出 SVG 时，强制加上 <code>fill-rule="evenodd"</code> 属性，这能掩盖 90% 的方向性错误。</li>
+</ol>
+</blockquote>
+<hr />
+<h2 id="156-typography-layout">15.6 排版系统 (Typography Layout)</h2>
+<p>生成单个字形只是第一步，生成<strong>单词</strong>或<strong>版面</strong>需要考虑字符间的关系。</p>
+<h3 id="1561-kerning">15.6.1 字距 (Kerning)</h3>
+<p>SVG 中的 <code>&lt;text&gt;</code> 标签支持字距，但如果我们生成的是纯 path（为了艺术效果），模型必须自己计算位置。</p>
+<ul>
+<li><strong>Kerning Pairs</strong>：'A' 和 'V' 放在一起时，距离应该比 'H' 和 'H' 近。模型需要学习字符形状的<strong>互补性</strong>。</li>
+</ul>
+<h3 id="1562-text-on-path">15.6.2 文本沿路径 (Text on Path)</h3>
+<p>SVG 的 <code>&lt;textPath&gt;</code> 是强大的排版工具。</p>
+<ul>
+<li><strong>任务</strong>：给定一段文字和一条曲线描述（如“波浪线”），生成 <code>&lt;defs&gt;&lt;path id="p1" .../&gt;&lt;/defs&gt;&lt;text&gt;&lt;textPath href="#p1"&gt;Hello World&lt;/textPath&gt;&lt;/text&gt;</code>。</li>
+<li><strong>难点</strong>：模型需要理解文字长度与路径长度的匹配关系，避免文字被截断或挤压。</li>
+</ul>
+<hr />
+<h2 id="157">15.7 评测体系：如何评价一个生成的“字”？</h2>
+<p>像素级的相似度（PSNR/SSIM）在字体评测中意义不大。</p>
+<ol>
+<li><strong>轮廓质量 (Contour Quality)</strong>：<ul>
+<li><strong>平滑度</strong>：计算曲率变化率，惩罚不必要的剧烈抖动。</li>
+<li><strong>极简度</strong>：使用最少的控制点还原形状（可以用点数/周长比来衡量）。</li>
+</ul>
+</li>
+<li><strong>可读性 (Legibility)</strong>：<ul>
+<li>使用 OCR 模型（如 Tesseract 或 PaddleOCR）识别生成的 SVG 渲染图。如果 OCR 认不出这是 'A'，那它就失败了。</li>
+</ul>
+</li>
+<li><strong>风格一致性 (Style Consistency)</strong>：<ul>
+<li>训练一个风格分类器（Classifier），判断生成的 'A' 和参考的 'B' 是否属于同一字体家族。</li>
+</ul>
+</li>
+<li><strong>几何合法性 (Validity)</strong>：<ul>
+<li>自交检测（Self-intersection rate）。</li>
+<li>闭合检测（Closed path check）。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="158">15.8 本章小结</h2>
+<ul>
+<li><strong>从宏观到微观</strong>：字体生成是 SVG 生成中对精度要求最高的任务。模型必须从通过大量数据隐式学会“极值点对齐”、“光学校正”和“拓扑规则”。</li>
+<li><strong>数据准备是关键</strong>：字体的坐标系转换、方向标准化（Winding rules）和去重是训练高质量模型的前提。</li>
+<li><strong>应用价值</strong>：除了造字，该技术还广泛应用于 Logo 设计、艺术字生成（WordArt）和矢量风格迁移。</li>
+<li><strong>工程落地</strong>：生成的 SVG 只是半成品，结合 <code>fonttools</code> 等工程库将其转化为标准字体文件，才能打通应用的最后一公里。</li>
+</ul>
+<hr />
+<h2 id="159">15.9 练习题</h2>
+<h3 id="basic">基础题 (Basic)</h3>
+<ol>
+<li><strong>填充规则</strong>：给定一个 SVG <code>&lt;path d="..." /&gt;</code> 包含两个同心圆路径，且绘制方向相同（都是顺时针）。如果显式设置 <code>fill-rule="evenodd"</code>，渲染结果是什么？如果设置 <code>fill-rule="nonzero"</code> 呢？</li>
+<li><strong>坐标转换</strong>：某字体文件设计的 EM Height 为 1000，基线 (Baseline) 在 y=0。如果我们要将其放入一个 <code>viewBox="0 0 1000 1000"</code> 的 SVG 中（y 轴向下，原点左上），原基线对应的 SVG y 坐标应该是多少？（假设 Ascender+Descender 填满整个 EM 框）。</li>
+<li><strong>贝塞尔曲线</strong>：在 SVG path data 中，<code>C</code> 命令后跟随 6 个数字，<code>Q</code> 命令后跟随 4 个数字。请解释这两种命令在控制点数量上的区别。</li>
+</ol>
+<h3 id="challenge">挑战题 (Challenge)</h3>
+<ol start="4">
+<li><strong>字形拓扑分类</strong>：为了让模型更好地学习字形结构，我们可以给每个字母打上“拓扑标签”。请将 26 个大写字母按“洞（Counter/Hole）的数量”分类（0 个洞，1 个洞，2 个洞）。这对训练有什么帮助？</li>
+<li><strong>字重插值思考</strong>：假设你有 Regular 'A'（SVG 代码 A）和 Bold 'A'（SVG 代码 B）。代码 A 用了 10 个指令，代码 B 用了 12 个指令。为什么直接对数值进行线性插值（$C = 0.5A + 0.5B$）会失败？你会如何设计一个算法来解决这个问题？</li>
+<li><strong>Prompt Engineering</strong>：编写一个 Prompt，指导 MLLM 修改一个现有的 SVG 字母 'H'，将其变成“衬线体（Serif）”风格。你需要用自然语言描述哪些几何变化？</li>
+</ol>
+<hr />
+<h3 id="_1">练习题提示与答案</h3>
+<details>
+<summary><strong>点击查看提示 (Hint)</strong></summary>
+<ul>
+<li><strong>题 1 提示</strong>：Even-odd 只数层数；Non-zero 要算方向向量和。</li>
+<li><strong>题 2 提示</strong>：SVG 的 y=0 在顶部，y=1000 在底部。字体坐标系通常 y=0 在基线，Ascender 向上为正。你需要做一个 1000 - y 的翻转操作，并考虑基线在 EM 框中的相对位置（通常基线不在最底部，因为还有 Descender）。假设基线位于 EM 框的 y=200 处（即 descender 高度为 200），翻转后会是多少？</li>
+<li><strong>题 3 提示</strong>：Cubic vs Quadratic。</li>
+<li><strong>题 4 提示</strong>：B 有 2 个洞。A, D, O, P, Q, R 有 1 个洞。</li>
+<li><strong>题 5 提示</strong>：插值的前提是“一一对应”。多出来的 2 个指令怎么处理？</li>
+<li><strong>题 6 提示</strong>：描述“脚（feet）”和“头（top）”的形状变化。</li>
+</ul>
+</details>
+<details>
+<summary><strong>点击查看答案 (Answer)</strong></summary>
+<ol>
+<li><strong>答案</strong>：<ul>
+<li><code>evenodd</code>: 渲染为圆环（镂空）。因为射线穿过 2 层（偶数），中间部分被视为外部。</li>
+<li><code>nonzero</code>: 渲染为实心大圆。因为方向相同，winding number 累加不为 0，视为内部。</li>
+</ul>
+</li>
+<li><strong>答案</strong>：这取决于字体的具体的 Ascender/Descender 设置。通常 EM Square 的原点 (0,0) 在基线上。假设字体的设计范围是 y: -200 到 800 (总高 1000)。<ul>
+<li>在字体坐标中，基线 y=0。</li>
+<li>映射到 SVG (y 轴翻转，原点左上)：</li>
+<li>字体最高点 (800) -&gt; SVG y=0</li>
+<li>字体基线 (0) -&gt; SVG y=800</li>
+<li>字体最低点 (-200) -&gt; SVG y=1000</li>
+<li><strong>答案</strong>：SVG y = 800 (具体取决于 metrics 设置，通常基线位于视口底部向上约 20%-25% 处)。</li>
+</ul>
+</li>
+<li><strong>答案</strong>：<code>C</code> (Cubic) 有 <strong>2 个</strong>控制点（加终点共3个坐标点，6个数值）。<code>Q</code> (Quadratic) 有 <strong>1 个</strong>控制点（加终点共2个坐标点，4个数值）。</li>
+<li><strong>答案</strong>：<ul>
+<li><strong>0 洞</strong>：C, E, F, G, H, I, J, K, L, M, N, S, T, U, V, W, X, Y, Z</li>
+<li><strong>1 洞</strong>：A, D, O, P, Q, R</li>
+<li><strong>2 洞</strong>：B</li>
+<li><strong>意义</strong>：可以作为 Class Token 或 Control Condition 输入给模型，帮助模型在生成前确定拓扑结构，避免生成出“实心的 A”或“带洞的 I”。</li>
+</ul>
+</li>
+<li><strong>答案</strong>：失败原因是因为<strong>结构不对应</strong>。插值需要向量维度一致。解决方法：使用<strong>重采样（Resampling）</strong>或<strong>点匹配算法</strong>。先将 Regular 'A' 的 10 个指令增加到 12 个（插入 2 个对形状影响最小的冗余点），并调整点的起始位置（Start Point）使其对齐，然后再插值。</li>
+<li>
+<p><strong>答案示例</strong>：
+    "Modify the SVG path of the letter 'H' to apply a serif style.</p>
+<ol>
+<li>Add horizontal slabs/brackets at the top and bottom endpoints of both vertical stems.</li>
+<li>Introduce a slight variation in stroke width: make the vertical stems thicker and the horizontal crossbar thinner (high contrast).</li>
+<li>Ensure all connections between stems and serifs are curved (bracketed serifs), not sharp right angles."</li>
+</ol>
+</li>
+</ol>
+</details>
+<hr />
+<h2 id="1510-gotchas">15.10 常见陷阱与错误 (Gotchas)</h2>
+<h3 id="15101-the-kink">15.10.1 "The Kink" (曲线拐点)</h3>
+<ul>
+<li><strong>现象</strong>：生成的曲线在连接处出现尖角或不平滑的“疙瘩”。</li>
+<li><strong>原因</strong>：两个连续的贝塞尔曲线段（Segment），连接点处的切线方向不共线。在 SVG 中，如果前一段的第二个控制点、连接点、后一段的第一个控制点不在一条直线上，就会产生 G1 不连续。</li>
+<li><strong>Debug</strong>：检查生成的 path 数据，计算相邻控制点的斜率。</li>
+</ul>
+<h3 id="15102-missing-extrema">15.10.2 极值点缺失 (Missing Extrema)</h3>
+<ul>
+<li><strong>现象</strong>：渲染出来的曲线虽然形状大概对，但在转换为 .ttf 并在 Windows/Mac 上渲染时，小字号下出现严重失真。</li>
+<li><strong>原因</strong>：字体渲染引擎（Hinting system）强烈依赖曲线在水平和垂直方向的极值点（Extrema points）上有显式的节点（On-curve point）。如果模型用一个大大的 <code>C</code> 命令直接画了一个半圆，而没有在最高点切断加点，渲染效果会变差。</li>
+<li><strong>Fix</strong>：使用后处理脚本，在所有曲线的水平/垂直切线位置强制插入节点。</li>
+</ul>
+<h3 id="15103">15.10.3 浮点数精度爆炸</h3>
+<ul>
+<li><strong>现象</strong>：SVG 文件巨大，包含 <code>M 10.999999999 5.000000001</code>。</li>
+<li><strong>原因</strong>：模型输出了高精度浮点数。</li>
+<li><strong>影响</strong>：除了增加 token 消耗，过高的精度在字体设计中往往意味着噪点。</li>
+<li><strong>建议</strong>：在 Tokenizer 阶段进行坐标量化（Round to integer or 1 decimal），字体设计通常基于整数网格（Integer Grid）就足够了。</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter14.html" class="nav-link prev">← 第 14 章：SVG Animation：时间维度、交互与可控运动生成</a><a href="chapter16.html" class="nav-link next">第 16 章：应用专题 II：BEV 矢量地图与系统落地（SVG × Map/Driving） →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

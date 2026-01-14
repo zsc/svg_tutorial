@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 14 章：SVG Animation：时间维度、交互与可控运动生成</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter10.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 10 章：现代 SVG 工作谱系综述：StarVector、OmniSVG、InternSVG 等</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter13.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 13 章：评测体系：像素、结构、语义与可编辑性</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter14.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 14 章：SVG Animation：时间维度、交互与可控运动生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter15.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter16.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 16 章：应用专题 II：BEV 矢量地图与系统落地（SVG × Map/Driving）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="14-svg-animation">第 14 章：SVG Animation：时间维度、交互与可控运动生成</h1>
+<h2 id="1">1. 开篇段落</h2>
+<p>在前面的十三章中，我们已经教会了 MLLM 如何“看懂”静态的几何结构，并能生成高质量的矢量插画。然而，物理世界是动态的。对于一个真正具备多模态理解与生成能力的模型来说，仅仅理解“圆”是不够的，它还需要理解“滚动”；仅仅理解“按钮”是不够的，它需要理解“点击后的反馈”。</p>
+<p>本章标志着我们从 <strong>空间建模（Spatial Modeling）</strong> 迈向 <strong>时空建模（Spatiotemporal Modeling）</strong>。在 SVG 中，时间维度并非像像素视频那样由无数帧图像堆叠而成，而是通过<strong>参数插值（Interpolation）</strong>和<strong>状态机（State Machine）</strong>来描述。这种紧凑的文本表示为 MLLM 提供了巨大的优势：模型可以用极少的 Token 生成长达数秒的流畅动画，而无需像视频生成模型（Sora 等）那样处理巨大的像素计算量。</p>
+<p>本章将系统解构 SVG 动画的三大支柱——SMIL、CSS 与 JS，并重点聚焦于最适合大模型学习的 <strong>SMIL（声明式动画）</strong>。我们将深入算法底层，探讨如何解决 Path Morphing 中的点匹配难题（Correspondence Problem），如何设计时序损失函数（Temporal Loss），以及如何让模型学会“缓动（Easing）”的物理质感。</p>
+<h2 id="2">2. 核心论述</h2>
+<h3 id="141-svg-mllm">14.1 SVG 动画的“三驾马车”与 MLLM 的选择</h3>
+<p>在让模型生成动画前，必须明确“输出格式”的选择逻辑。SVG 动画生态存在三种技术栈，对于 MLLM 的训练难度和推理能力要求截然不同：</p>
+<p>| 特性 | <strong>SMIL (推荐)</strong> | <strong>CSS Animation</strong> | <strong>JS (GSAP/Three.js)</strong> |</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;"><strong>SMIL (推荐)</strong></th>
+<th style="text-align: left;"><strong>CSS Animation</strong></th>
+<th style="text-align: left;"><strong>JS (GSAP/Three.js)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>实现方式</strong></td>
+<td style="text-align: left;">XML 标签 (<code>&lt;animate&gt;</code>)</td>
+<td style="text-align: left;">样式表 (<code>@keyframes</code>)</td>
+<td style="text-align: left;">命令式代码</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>自包含性</strong></td>
+<td style="text-align: left;"><strong>高</strong> (单文件，无依赖)</td>
+<td style="text-align: left;">中 (需分离结构与样式)</td>
+<td style="text-align: left;">低 (需运行时环境)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>上下文长度</strong></td>
+<td style="text-align: left;"><strong>紧凑</strong> (就近原则)</td>
+<td style="text-align: left;">冗余 (选择器映射)</td>
+<td style="text-align: left;">复杂 (逻辑代码多)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>可微渲染</strong></td>
+<td style="text-align: left;"><strong>支持</strong> (部分渲染器)</td>
+<td style="text-align: left;">支持</td>
+<td style="text-align: left;"><strong>极难</strong> (需 JS 引擎)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MLLM 适用性</strong></td>
+<td style="text-align: left;"><strong>最佳</strong> (声明式，易于 Token 化)</td>
+<td style="text-align: left;">较好 (适合简单动效)</td>
+<td style="text-align: left;">适合作为 Agent 工具调用</td>
+</tr>
+</tbody>
+</table>
+<p><strong>结论</strong>：本教程构建的 SVG-MLLM 将以 <strong>SMIL</strong> 为核心生成目标。因为它将“时间”变成了一种可被 Token 化的 XML 属性，使得 Transformer 可以像预测颜色一样预测“运动轨迹”。</p>
+<h3 id="142">14.2 声明式动画的核心语法与参数化建模</h3>
+<p>模型需要学习将自然语言中的“动作描述”映射为具体的 XML 参数。</p>
+<h4 id="1421">14.2.1 基础属性与时间轴映射</h4>
+<ul>
+<li><strong>Targeting (<code>attributeName</code>)</strong>：模型必须学会区分几何属性（<code>d</code>, <code>x</code>, <code>y</code>）与外观属性（<code>fill</code>, <code>opacity</code>）。</li>
+<li><strong>Timeline (<code>dur</code>, <code>begin</code>)</strong>：时间单位的理解。例如，“快速闪烁”对应 <code>dur="0.2s"</code>，“缓慢浮现”对应 <code>dur="2s"</code>。</li>
+<li><strong>Loop (<code>repeatCount</code>)</strong>：理解“一次性动作”与“循环状态”的区别。</li>
+</ul>
+<h4 id="1422-easing">14.2.2 关键帧与非线性插值（Easing）</h4>
+<p>这是体现动画“质感”的关键。物理世界的运动很少是线性的。模型需要掌握 <code>calcMode</code> 和 <code>keySplines</code>。</p>
+<ul>
+<li><strong>Linear</strong>: 机械运动。</li>
+<li><strong>Spline (贝塞尔缓动)</strong>: 模拟加速、减速、弹跳。</li>
+</ul>
+<p><strong>ASCII 图解：大模型视角的动画数据结构</strong></p>
+<div class="codehilite"><pre><span></span><code>[Input Prompt]: &quot;一个红色的小球，先快速下落，然后缓慢弹起&quot;
+
+[Generated SVG Logic]:
+&lt;circle cy=&quot;10&quot;&gt;
+  &lt;animate 
+     attributeName=&quot;cy&quot;
+     values=&quot;10; 100; 50&quot;      &lt;-- 关键位置：顶 -&gt; 底 -&gt; 中间
+     keyTimes=&quot;0; 0.3; 1&quot;      &lt;-- 时间分割：下落快(0-0.3)，回弹慢(0.3-1)
+     calcMode=&quot;spline&quot;         &lt;-- 启用非线性插值
+     keySplines=&quot;0.4 0 1 1;    &lt;-- 下落加速曲线 (Bezier控制点)
+                 0 0 0.2 1&quot;    &lt;-- 回弹减速曲线
+  /&gt;
+&lt;/circle&gt;
+</code></pre></div>
+
+<blockquote>
+<p><strong>技术难点</strong>：MLLM 很难直接输出完美的 4 个浮点数（<code>keySplines</code>）来代表物理曲线。通常策略是让模型先输出语义 Token（如 <code>&lt;ease-in-out&gt;</code>），在后处理阶段转译为具体的数值。</p>
+</blockquote>
+<h3 id="143-path-morphing">14.3 Path Morphing：拓扑一致性的深度算法</h3>
+<p>这是 SVG 动画生成的“圣杯”，也是 Deep Learning 介入最深的领域。Morphing 要求形状 A 变到形状 B 时，两者必须具备<strong>相同的拓扑结构（Path Topology）</strong>。</p>
+<h4 id="1431-the-correspondence-problem">14.3.1 对应性问题 (The Correspondence Problem)</h4>
+<p>如果 <code>Path_A</code> 有 10 个控制点，<code>Path_B</code> 有 20 个控制点，直接插值会导致渲染崩溃。
+<strong>MLLM 必须学会（或隐式包含）以下预处理逻辑：</strong></p>
+<ol>
+<li><strong>超分重采样 (Super-sampling)</strong>：在生成动画前，将所有路径重采样为固定数量的点（例如 $N=64$），或基于曲率自适应加点。</li>
+<li><strong>点对齐 (Alignment)</strong>：<ul>
+<li>即使点数相同，起点不同也会导致“翻转”。</li>
+<li><strong>算法思路</strong>：计算 A 与 B 之间所有可能的起点偏移（Cyclic Shift）的 Chamfer Distance 或 L2 距离，选择距离最小的偏移量作为对齐标准。</li>
+</ul>
+</li>
+</ol>
+<h4 id="1432-winding-order">14.3.2 绕序问题 (Winding Order)</h4>
+<p>如果 A 是顺时针画的，B 是逆时针画的，Morphing 过程中图形会“自我翻面”。</p>
+<ul>
+<li><strong>检测</strong>：利用鞋带公式（Shoelace Formula）计算有向面积。</li>
+<li><strong>修正</strong>：确保 <code>sign(Area_A) == sign(Area_B)</code>，否则翻转其中一个的坐标序列。</li>
+</ul>
+<p><strong>ASCII 图解：Morphing 对齐流水线</strong></p>
+<div class="codehilite"><pre><span></span><code>原始 SVG A (3 pts)      原始 SVG B (4 pts)
+      \                    /
+       \ [1. Upsampling]  /
+        \                /
+      A&#39; (64 pts)      B&#39; (64 pts)
+          \            /
+           \ [2. Cyclic Matching] &lt;-- 核心难点：寻找最佳起点 k
+            \          /
+             \        /
+       Aligned A&#39;&#39; -&gt; B&#39;&#39; (Ready for &lt;animate values=&quot;A&#39;&#39;; B&#39;&#39;&quot;&gt;)
+</code></pre></div>
+
+<h3 id="144-hierarchical-motion">14.4 分层动画与复合运动 (Hierarchical Motion)</h3>
+<p>复杂的动画往往是多个简单运动的叠加。SVG 的 <code>&lt;g&gt;</code> 标签天然支持这种<strong>运动解耦（Motion Decoupling）</strong>。</p>
+<ul>
+<li>
+<p><strong>案例：行走的机器人</strong></p>
+<ul>
+<li>根节点 <code>&lt;g&gt;</code>：负责水平位移（Translate X）。</li>
+<li>子节点（手臂）<code>&lt;g&gt;</code>：负责绕肩关节旋转（Rotate）。</li>
+<li>孙节点（手掌）：负责开合。</li>
+</ul>
+</li>
+<li>
+<p><strong>MLLM 的挑战</strong>：模型需要建立“场景图（Scene Graph）”的认知。如果直接预测最终顶点的世界坐标，会导致极高的计算量和抖动。</p>
+</li>
+<li><strong>Rule of Thumb</strong>：训练数据中，应鼓励模型生成嵌套的 <code>&lt;animateTransform&gt;</code>，而不是把所有坐标都算死在 <code>d</code> 属性里。这样生成的动画更具可编辑性。</li>
+</ul>
+<h3 id="145">14.5 交互式动画：事件驱动的状态机</h3>
+<p>当 SVG 包含交互时，它实际上变成了一个<strong>有限状态机（FSM）</strong>。</p>
+<ul>
+<li><strong>Trigger</strong>：<code>begin="click"</code>, <code>begin="mouseover"</code>.</li>
+<li><strong>Chaining</strong>：<code>begin="anim1.end + 0.5s"</code>.</li>
+<li><strong>State Keeping</strong>：<code>fill="freeze"</code>（保持结束状态） vs <code>fill="remove"</code>（回滚）。</li>
+</ul>
+<p><strong>生成任务设计</strong>：
+Prompt: <em>"创建一个按钮，鼠标悬停时变宽并改变颜色，点击后消失。"</em>
+MLLM 输出需包含：</p>
+<ol>
+<li><code>&lt;rect id="btn"&gt;</code></li>
+<li><code>&lt;animate attributeName="width" begin="btn.mouseover" end="btn.mouseout" ... /&gt;</code></li>
+<li><code>&lt;animate attributeName="opacity" begin="btn.click" to="0" fill="freeze" ... /&gt;</code></li>
+</ol>
+<p>这里，<code>id</code> 的引用一致性是模型最容易出错的地方（幻觉产生不存在的 ID）。</p>
+<h3 id="146">14.6 训练与生成架构设计</h3>
+<p>如何构建一个 SVG 动画生成模型？</p>
+<h4 id="1461">14.6.1 数据集构建</h4>
+<ul>
+<li><strong>来源</strong>：Lottie Files（转 SVG）、网页爬取的 Icon 动画。</li>
+<li><strong>增强</strong>：对静态 SVG 进行程序化增强（随机添加平移、缩放、旋转动画），让模型先学会简单的运动规律。</li>
+</ul>
+<h4 id="1462">14.6.2 模型输入输出</h4>
+<ol>
+<li><strong>Text-to-Animation</strong>：<ul>
+<li>Input: <code>Prompt + Static SVG Code</code></li>
+<li>Output: <code>SVG with &lt;animate&gt; tags</code></li>
+</ul>
+</li>
+<li><strong>Video-to-Animation (Vectorization)</strong>：<ul>
+<li>Input: <code>Video Frames</code></li>
+<li>Output: <code>SVG Animation</code></li>
+<li><em>技术栈</em>：通常需要先提取关键帧进行 Image-to-SVG 转换，然后使用匈牙利算法匹配帧间图元，最后拟合出 <code>&lt;animate&gt;</code> 参数。</li>
+</ul>
+</li>
+</ol>
+<h4 id="1463-loss-functions">14.6.3 损失函数 (Loss Functions)</h4>
+<p>在训练闭环中（见第7章），除常规文本 Cross-Entropy Loss 外，还需引入：</p>
+<ol>
+<li>
+<p><strong>时序一致性损失 (Temporal Consistency Loss)</strong>：
+    渲染 $t=0, 0.5, 1.0$ 时刻的图像，与 Ground Truth 对应时刻计算视觉差异。</p>
+</li>
+<li>
+<p><strong>平滑性正则 (Smoothness Regularization)</strong>：
+    惩罚控制点轨迹的二阶导数（加速度），防止动画抖动。</p>
+</li>
+<li>
+<p><strong>面积守恒约束</strong>：
+    对于非消失类动画，惩罚总面积的剧烈波动，防止图形坍缩。</p>
+</li>
+</ol>
+<hr />
+<h2 id="3">3. 本章小结</h2>
+<ol>
+<li><strong>时间即参数</strong>：SVG 动画本质上是对 XML 属性的参数化插值。MLLM 利用其强大的序列处理能力，天然适合处理这种结构化的时间描述。</li>
+<li><strong>拓扑先于运动</strong>：高质量 Morphing 的前提是严格的拓扑对齐（点数相同、起点对齐、绕序一致）。这是从“静态生成”跨越到“动态生成”的算法门槛。</li>
+<li><strong>层级表达</strong>：利用 <code>&lt;g&gt;</code> 和 <code>&lt;animateTransform&gt;</code> 进行运动分解，是生成复杂、解耦、可编辑动画的最佳实践。</li>
+<li><strong>闭环验证</strong>：动画生成的评测不能只看代码，必须通过渲染器在时间轴上采样，验证视觉上的连贯性和物理上的合理性。</li>
+</ol>
+<hr />
+<h2 id="4">4. 练习题</h2>
+<h3 id="_1">基础题 (熟悉材料)</h3>
+<ol>
+<li><strong>语法重构</strong>：给定一个 <code>&lt;rect x="0" y="0" width="10" height="10"/&gt;</code>。请写出两段不同的代码实现将其移动到 <code>x=100</code> 的动画：<ul>
+<li>方法 A：使用 <code>&lt;animate attributeName="x" ... /&gt;</code></li>
+<li>方法 B：使用 <code>&lt;animateTransform type="translate" ... /&gt;</code></li>
+<li><em>Hint</em>: 思考两者对坐标系影响的区别。</li>
+</ul>
+</li>
+<li><strong>Easing 理解</strong>：在 SMIL 中，<code>keyTimes="0; 0.2; 1"</code> 和 <code>values="0; 80; 100"</code> 组合，描述了一种什么样的运动节奏？是先快后慢，还是先慢后快？</li>
+<li><strong>Debug 练习</strong>：一段动画代码 <code>&lt;animate ... fill="remove"/&gt;</code> 播放结束时，图形突然跳回了初始位置。请解释原因并给出修复方案。</li>
+</ol>
+<h3 id="_2">挑战题 (开放性思考)</h3>
+<ol start="4">
+<li><strong>算法实现</strong>：编写一个 Python 函数 <code>align_paths(path_a, path_b)</code>。<ul>
+<li>输入：两个不同点数的 SVG Path 命令序列。</li>
+<li>输出：两个点数相同、且起点已对齐的 Path，可直接用于 Morphing。</li>
+<li><em>Hint</em>: 使用 <code>svgpathtools</code> 库进行重采样；使用 Numpy <code>roll</code> 寻找最佳匹配点。</li>
+</ul>
+</li>
+<li><strong>模型设计</strong>：设计一个“会呼吸的 Logo”生成任务。<ul>
+<li>输入：任意静态 Logo 的 SVG。</li>
+<li>目标：输出该 Logo 缓慢缩放（Scale 1.0 $\leftrightarrow$ 1.1）且透明度微调的动画。</li>
+<li>要求：保持 Logo 内部各部件的相对位置不变（需正确计算 <code>center</code>）。请描述 Prompt 设计和后处理步骤。</li>
+</ul>
+</li>
+<li><strong>Video-to-SVG 思考</strong>：假设你有一个 2秒钟的“马奔跑”视频。你希望将其转换为 SVG 动画。<ul>
+<li>方案 A：每帧生成一个独立的 SVG Group，通过 <code>display</code> 属性切换（定格动画）。</li>
+<li>方案 B：提取马的轮廓，使用 <code>&lt;animate d="..."&gt;</code> 进行形变。</li>
+<li>请分析两种方案在 <strong>文件大小</strong>、<strong>视觉流畅度</strong> 和 <strong>生成难度</strong> 上的优劣。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="5-gotchas">5. 常见陷阱与错误 (Gotchas)</h2>
+<ol>
+<li>
+<p><strong>旋转中心的默认陷阱</strong></p>
+<ul>
+<li><strong>现象</strong>：模型生成的旋转动画，物体总是绕着画布左上角 <code>(0,0)</code> 飞出去，而不是绕自身旋转。</li>
+<li><strong>原因</strong>：<code>&lt;animateTransform type="rotate"&gt;</code> 默认中心是原点。</li>
+<li><strong>修复</strong>：必须显式指定中心点 <code>from="0 cx cy" to="360 cx cy"</code>，或者先将物体中心 <code>translate</code> 到原点，旋转后再移回。</li>
+</ul>
+</li>
+<li>
+<p><strong>单位混合导致的“幻觉”</strong></p>
+<ul>
+<li><strong>现象</strong>：<code>values="10px; 50%; 20em"</code>。</li>
+<li><strong>原因</strong>：MLLM 训练数据中包含多种单位，生成时产生混淆。SVG 规范通常不允许在动画中混合单位。</li>
+<li><strong>策略</strong>：在预处理阶段，强制将所有数据归一化为无单位的用户坐标（user units）。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>keyTimes</code> 与 <code>values</code> 数量不匹配</strong></p>
+<ul>
+<li><strong>现象</strong>：动画完全不播放。</li>
+<li><strong>规范</strong>：SMIL 严格要求 <code>keyTimes</code> 的列表长度必须与 <code>values</code> 一致（除非 <code>calcMode="spline"</code>，此时 <code>keySplines</code> 长度为 <code>values</code> 长度减 1）。这是生成模型最容易违反的语法约束。</li>
+</ul>
+</li>
+<li>
+<p><strong>ID 命名空间的污染</strong></p>
+<ul>
+<li><strong>现象</strong>：在一个页面展示多个生成的 SVG 时，点击 A 的按钮，B 的动画动了。</li>
+<li><strong>原因</strong>：模型生成的 ID 都是通用的（如 <code>id="circle1"</code>）。</li>
+<li><strong>工程解法</strong>：在渲染或后处理阶段，为生成的每个 SVG 分配唯一的 UUID 前缀（如 <code>id="gen_x9d_circle1"</code>）。</li>
+</ul>
+</li>
+<li>
+<p><strong>插值引起的“路径自交”</strong></p>
+<ul>
+<li><strong>现象</strong>：Morphing 过程中，图形中间出现奇怪的蝴蝶结状打结。</li>
+<li><strong>原因</strong>：控制点在移动轨迹上交叉了。通常源于起点对齐错误或复杂的非凸图形形变。</li>
+<li><strong>缓解</strong>：在 Loss 中加入“自交惩罚（Self-intersection Penalty）”，或简化路径为凸包组合。</li>
+</ul>
+</li>
+</ol>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter13.html" class="nav-link prev">← 第 13 章：评测体系：像素、结构、语义与可编辑性</a><a href="chapter15.html" class="nav-link next">第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography) →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

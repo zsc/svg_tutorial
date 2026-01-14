@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 10 章：现代 SVG 工作谱系综述：StarVector、OmniSVG、InternSVG 等</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter10.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 10 章：现代 SVG 工作谱系综述：StarVector、OmniSVG、InternSVG 等</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter13.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 13 章：评测体系：像素、结构、语义与可编辑性</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter14.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 14 章：SVG Animation：时间维度、交互与可控运动生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter15.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 15 章：应用专题 I：字体、字形生成与排版 (SVG × Typography)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter16.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 16 章：应用专题 II：BEV 矢量地图与系统落地（SVG × Map/Driving）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="10-svg-starvectoromnisvginternsvg">第 10 章：现代 SVG 工作谱系综述：StarVector、OmniSVG、InternSVG 等</h1>
+<h2 id="101">10.1 开篇段落：矢量生成的“寒武纪大爆发”</h2>
+<p>在 DeepSVG（2020）奠定了深度学习处理矢量数据的基石后，学术界和工业界沉寂了短暂的时间。然而，随着多模态大模型（MLLM）和扩散模型（Diffusion Models）的崛起，SVG 生成领域迎来了“寒武纪大爆发”。</p>
+<p>本章将带你穿越 2023-2024 年的前沿工作。我们将不再局限于简单的“图标重建”，而是探讨如何让模型<strong>理解复杂的层级结构</strong>、<strong>处理图文对齐</strong>以及<strong>通过代码推理生成矢量</strong>。</p>
+<p><strong>本章的学习目标</strong>：</p>
+<ol>
+<li><strong>理解三大流派</strong>：基于 Token 的自回归（Autoregressive）、基于扩散（Diffusion）和基于大语言模型（LLM-based）的本质区别。</li>
+<li><strong>解构核心架构</strong>：深入 <strong>StarVector</strong> 的多模态编码器设计、<strong>InternSVG</strong> 的指令微调策略以及 <strong>DiffVG</strong> 的梯度传播机制。</li>
+<li><strong>提取设计原语</strong>：从这些工作中提炼出通用的设计模式（如坐标量化策略、序列排序增强），为我们在第 11 章自行设计架构做好储备。</li>
+</ol>
+<hr />
+<h2 id="102">10.2 研究版图：从“死记硬背”到“语义推理”</h2>
+<p>在 DeepSVG 时代，模型更像是一个“复读机”，记忆坐标的分布。而现代工作致力于让模型拥有“画师的思维”。我们可以将现有工作版图通过以下 ASCII 矩阵来理解：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">+-----------------------------------------------------------------------------+</span>
+<span class="c">|                     Modern SVG Generation Taxonomy                          |</span>
+<span class="nb">+-----------------------------------------------------------------------------+</span>
+<span class="c">|                          |  输入模态 (Input)                                |</span>
+<span class="c">|   核心机制 (Mechanism)   | </span><span class="nb">------------------------------------------------</span><span class="c"> |</span>
+<span class="c">|                          |  Image (Pixel)     |  Text (Description)         |</span>
+<span class="nb">+--------------------------+--------------------+-----------------------------+</span>
+<span class="c">|                          | </span><span class="k">[</span><span class="c">Im2Vec</span><span class="k">]</span><span class="c">           | </span><span class="k">[</span><span class="c">DeepSVG</span><span class="nb">-</span><span class="c">Text</span><span class="k">]</span><span class="c">              |</span>
+<span class="c">| 1</span><span class="nt">.</span><span class="c"> 自回归序列生成        | </span><span class="k">[</span><span class="c">StarVector</span><span class="k">]</span><span class="c">       | </span><span class="k">[</span><span class="c">IconShop</span><span class="k">]</span><span class="c">                  |</span>
+<span class="c">| (Autoregressive/Transformer)| 强结构，依赖大量数据 | 需解决文本</span><span class="nb">-</span><span class="c">形状对齐难题       |</span>
+<span class="nb">+--------------------------+--------------------+-----------------------------+</span>
+<span class="c">|                          |                    | </span><span class="k">[</span><span class="c">VectorFusion</span><span class="k">]</span><span class="c">              |</span>
+<span class="c">| 2</span><span class="nt">.</span><span class="c"> 扩散模型生成          | </span><span class="nb">-</span><span class="c">                  | </span><span class="k">[</span><span class="c">SVG</span><span class="nb">-</span><span class="c">Diffusion</span><span class="k">]</span><span class="c">             |</span>
+<span class="c">| (Latent/Vector Diffusion)|                    | 多样性好，但难以保证拓扑合法性  |</span>
+<span class="nb">+--------------------------+--------------------+-----------------------------+</span>
+<span class="c">|                          | </span><span class="k">[</span><span class="c">InternSVG</span><span class="k">]</span><span class="c">        | </span><span class="k">[</span><span class="c">ChatSVG</span><span class="k">]</span><span class="c">                   |</span>
+<span class="c">| 3</span><span class="nt">.</span><span class="c"> LLM 代码生成          | (视觉作为 Prompt)   | </span><span class="k">[</span><span class="c">GPT</span><span class="nb">-</span><span class="c">4o</span><span class="k">]</span><span class="c">                    |</span>
+<span class="c">| (SVG</span><span class="nb">-</span><span class="c">as</span><span class="nb">-</span><span class="c">Code)            | 极强的语义推理，     | 几何精度较差，易产生幻觉      |</span>
+<span class="c">|                          | 拓扑完美           |                             |</span>
+<span class="nb">+--------------------------+--------------------+-----------------------------+</span>
+<span class="c">|                          | </span><span class="k">[</span><span class="c">CLIPasso</span><span class="k">]</span><span class="c">         | </span><span class="k">[</span><span class="c">LiveSketch</span><span class="k">]</span><span class="c">                |</span>
+<span class="c">| 4</span><span class="nt">.</span><span class="c"> 优化与迭代            | </span><span class="k">[</span><span class="c">Vectorization</span><span class="k">]</span><span class="c">    | (实时笔画优化)               |</span>
+<span class="c">| (Optimization</span><span class="nb">-</span><span class="c">based)     | 极其贴合原图，       | 速度慢，不可编辑（面条代码）   |</span>
+<span class="c">|                          | 但生成过程慢         |                             |</span>
+<span class="nb">+--------------------------+--------------------+-----------------------------+</span>
+</code></pre></div>
+
+<hr />
+<h2 id="103-starvector-token">10.3 StarVector：多模态引导与交错 Token 设计</h2>
+<p><strong>StarVector</strong> (CVPR 2024) 是目前 <code>Image-to-SVG</code> 任务中的 SOTA（最先进）代表之一。它解决了一个核心痛点：<strong>如何让生成的 SVG 既像原图（视觉保真），又具有合理的图层结构（拓扑合理）。</strong></p>
+<h3 id="1031">10.3.1 核心架构：双塔编码 + 解码</h3>
+<p>StarVector 并不只看 SVG 文本，它通过一个巧妙的架构同时利用了视觉特征和代码序列：</p>
+<ol>
+<li><strong>Visual Encoder (ViT)</strong>: 输入栅格图像，提取 Patch 级别的视觉特征。这解决了 DeepSVG 容易“画歪”的问题。</li>
+<li><strong>Sequence Encoder</strong>: 输入 SVG 的 Token 序列（用于训练时的 Teacher Forcing 或编辑任务）。</li>
+<li><strong>Codebook &amp; Tokenizer</strong>:<ul>
+<li>这是 StarVector 的精髓。它不使用简单的 <code>&lt;x&gt; &lt;y&gt;</code>，而是设计了包含 <strong>命令 Token (Command Tokens)</strong> 和 <strong>坐标 Token (Coordinate Tokens)</strong> 的混合词表。</li>
+<li><strong>坐标处理</strong>：它没有直接回归浮点数，而是将坐标离散化为 0-1024 的整数 Token，这样可以使用分类 Loss（Cross Entropy），比回归 Loss（MSE）收敛更稳定，且能捕捉多峰分布（例如一个点既可能在左边也可能在右边，而不是取平均值）。</li>
+</ul>
+</li>
+</ol>
+<h3 id="1032">10.3.2 关键创新：复杂度的处理</h3>
+<p>之前的模型只能画简单的 Icon。StarVector 引入了<strong>动态序列长度</strong>处理机制，能够生成包含数百个 Path 的复杂插画。它通过学习“什么时候结束当前 Path”和“什么时候结束整个文档”的 EOS (End of Sequence) Token 来实现层级控制。</p>
+<hr />
+<h2 id="104-internsvg">10.4 InternSVG：大模型时代的通用接口</h2>
+<p><strong>InternSVG</strong> 代表了 LLM 时代的解决思路。它的核心假设是：<strong>SVG 不需要专门的模型，通用 LLM 只要稍加微调（SFT）就能理解。</strong></p>
+<h3 id="1041-svg">10.4.1 “SVG 即代码”范式</h3>
+<p>InternSVG 不像 StarVector 那样从头训练一个 Transformer，而是基于 LLaMA 或 Vicuna 等开源大模型进行<strong>指令微调（Instruction Tuning）</strong>。</p>
+<ul>
+<li><strong>输入</strong>：<code>"Human: Draw a red circle suitable for an app icon. &lt;Img&gt;..."</code></li>
+<li><strong>输出</strong>：直接输出合法的 XML 字符串。</li>
+</ul>
+<h3 id="1042-llm">10.4.2 解决 LLM 的“几何盲区”</h3>
+<p>LLM 虽然懂 XML 语法，但对空间坐标极其不敏感（例如不知道 (100,100) 是中心还是右下角）。InternSVG 采用的策略：</p>
+<ol>
+<li><strong>坐标数值微调</strong>：在 SFT 数据集中，大量构造“描述 -&gt; 坐标”的强配对数据。</li>
+<li><strong>符号化推理</strong>：利用 Chain-of-Thought (CoT)，先生成 Bounding Box（边界框），再在框内生成具体 Path。</li>
+</ol>
+<h3 id="1043">10.4.3 为什么这对我们很重要？</h3>
+<p>在构建 MLLM 时，InternSVG 的思路告诉我们：<strong>利用预训练 LLM 的文本推理能力是处理复杂 User Prompt 的捷径</strong>。我们不需要从头教模型什么是“苹果”，只需要教它“苹果的 SVG 怎么画”。</p>
+<hr />
+<h2 id="105-omnisvg-vector-embeddings">10.5 OmniSVG 与矢量嵌入 (Vector Embeddings)</h2>
+<p><strong>OmniSVG</strong> 试图解决“专用性”问题。大多数模型要么专门生成字体（Glyph），要么专门生成图标。</p>
+<h3 id="1051-unified-representation">10.5.1 统一表征 (Unified Representation)</h3>
+<p>OmniSVG 提出了一种通用的潜空间（Latent Space）表示。</p>
+<ul>
+<li>它将不同类型的矢量数据（Icon, Character, Sketch）映射到同一个高维空间。</li>
+<li><strong>类比推理</strong>：通过向量运算实现风格迁移。例如：<code>Vector(粗体 'A') - Vector(细体 'A') + Vector(细体 'B') ≈ Vector(粗体 'B')</code>。</li>
+</ul>
+<h3 id="1052">10.5.2 属性解耦</h3>
+<p>它尝试将 SVG 的 <strong>几何结构 (Geometry)</strong> 和 <strong>样式属性 (Fill/Stroke/Color)</strong> 解耦。</p>
+<ul>
+<li><strong>Encoder A</strong> 提取形状结构。</li>
+<li><strong>Encoder B</strong> 提取配色风格。</li>
+<li>在解码时，可以将 A 的形状和 B 的风格组合，这为“可控生成”提供了极好的数学基础。</li>
+</ul>
+<hr />
+<h2 id="106-diffvg">10.6 优化基石：DiffVG 与可微渲染的数学直觉</h2>
+<p>虽然 <strong>DiffVG (Differentiable Vector Graphics)</strong> 是 2020 年的工作，但它是现代 SVG 训练不可或缺的组件（Loss 计算器）。</p>
+<h3 id="1061">10.6.1 为什么标准渲染不可导？</h3>
+<p>在标准渲染（如 Chrome）中，一个像素颜色的计算包含“判断点是否在三角形内”的硬阈值（Hard Threshold）：</p>
+<ul>
+<li>如果 $x &gt; edge$，颜色 = 黑色；否则 = 白色。</li>
+<li>这个阶跃函数（Step Function）导数为 0 或无穷大，梯度无法反向传播。</li>
+</ul>
+<h3 id="1062-diffvg">10.6.2 DiffVG 的解决方案</h3>
+<p>DiffVG 引入了<strong>抗锯齿的平滑近似</strong>：</p>
+<ul>
+<li>它计算像素中心到图形边缘的<strong>有向距离场 (Signed Distance Function, SDF)</strong>。</li>
+<li>将阶跃函数替换为 Sigmoid 或类似的平滑函数。</li>
+<li><strong>结果</strong>：当像素颜色与目标图不一致时，梯度会告诉控制点：“向左移动 0.1 像素，这个像素的颜色误差就会减小”。</li>
+</ul>
+<h3 id="1063-clipasso">10.6.3 CLIPasso：基于优化的生成</h3>
+<p><strong>CLIPasso</strong> 不是一个模型，而是一个基于 DiffVG 的优化过程。</p>
+<ol>
+<li><strong>初始化</strong>：随机扔几条贝塞尔曲线在画布上。</li>
+<li><strong>循环</strong>：<ul>
+<li>渲染成图 -&gt; 提取 CLIP 特征。</li>
+<li>计算 Loss：<code>1 - CosineSimilarity(Render_CLIP, Text_CLIP)</code>。</li>
+<li>Backprop (通过 DiffVG) -&gt; 更新曲线控制点坐标。</li>
+</ul>
+</li>
+<li><strong>结果</strong>：无需训练数据，直接为任意文本生成抽象画。<ul>
+<li><em>缺点</em>：生成的 Path 往往非常碎，缺乏人类设计的逻辑（例如一个圆可能由 10 条断开的线段组成）。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="107">10.7 补全版图：扩散模型与字体生成</h2>
+<h3 id="1071-vectorfusion-iconshop">10.7.1 矢量扩散模型 (VectorFusion / IconShop)</h3>
+<p>受到 Stable Diffusion 的启发，研究者尝试将扩散过程应用到矢量数据上。</p>
+<ul>
+<li><strong>挑战</strong>：扩散模型通常在连续空间工作，而 SVG 的命令（M/L/C）是离散类别。</li>
+<li><strong>策略</strong>：<ul>
+<li><strong>Latent Diffusion</strong>：先用 VAE 把 SVG 压缩成连续向量，在向量上做扩散。</li>
+<li><strong>Discrete Diffusion</strong>：直接在 Token 层面做带噪声的掩码预测。</li>
+</ul>
+</li>
+<li><strong>优势</strong>：生成的样本多样性极好，不再像 DeepSVG 那样千篇一律。</li>
+</ul>
+<h3 id="1072-deepvecfont">10.7.2 字体生成 (DeepVecFont 等)</h3>
+<p>字体是 SVG 的特殊子集，对拓扑一致性要求极高（必须闭合，不能自交）。相关工作通常引入了<strong>骨架引导 (Skeleton Guidance)</strong> 和 <strong>双轮廓约束</strong>，确保生成的字形既美观又符合几何规范。</p>
+<hr />
+<h2 id="108">10.8 综合对比与选型指南</h2>
+<p>下表对比了构建 SVG-MLLM 时可选的技术路线：</p>
+<p>| 特性 | DeepSVG (Baseline) | StarVector (SOTA) | InternSVG (LLM) | CLIPasso (Optimization) |</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">DeepSVG (Baseline)</th>
+<th style="text-align: left;">StarVector (SOTA)</th>
+<th style="text-align: left;">InternSVG (LLM)</th>
+<th style="text-align: left;">CLIPasso (Optimization)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>基础架构</strong></td>
+<td style="text-align: left;">Transformer (Seq2Seq)</td>
+<td style="text-align: left;">Transformer + ViT</td>
+<td style="text-align: left;">LLaMA / Vicuna</td>
+<td style="text-align: left;">无 (基于迭代优化)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>坐标表示</strong></td>
+<td style="text-align: left;">0-255 离散 Token</td>
+<td style="text-align: left;">0-1024 混合 Token</td>
+<td style="text-align: left;">纯文本浮点数</td>
+<td style="text-align: left;">连续浮点参数 (Tensor)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>多模态对齐</strong></td>
+<td style="text-align: left;">无 (单模态)</td>
+<td style="text-align: left;">强 (Visual Encoder)</td>
+<td style="text-align: left;">极强 (LLM 语义)</td>
+<td style="text-align: left;">强 (CLIP 语义)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>拓扑质量</strong></td>
+<td style="text-align: left;">中等 (偶有断裂)</td>
+<td style="text-align: left;"><strong>高 (结构清晰)</strong></td>
+<td style="text-align: left;"><strong>极高 (代码规范)</strong></td>
+<td style="text-align: left;">极差 (面条式路径)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>可编辑性</strong></td>
+<td style="text-align: left;">较好</td>
+<td style="text-align: left;">好</td>
+<td style="text-align: left;"><strong>最好 (带语义注释)</strong></td>
+<td style="text-align: left;">差</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>推理速度</strong></td>
+<td style="text-align: left;">快 (ms级)</td>
+<td style="text-align: left;">中 (秒级)</td>
+<td style="text-align: left;">慢 (LLM Token 生成慢)</td>
+<td style="text-align: left;">极慢 (分钟级迭代)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>适合场景</strong></td>
+<td style="text-align: left;">简单图标补全</td>
+<td style="text-align: left;">复杂插画矢量化</td>
+<td style="text-align: left;">复杂指令交互/修改</td>
+<td style="text-align: left;">艺术创作/抽象画</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rule of Thumb (经验法则)</strong>：</p>
+<ul>
+<li>如果你的目标是做<strong>设计助手</strong>（用户改图、换色、调整布局），选择 <strong>InternSVG</strong> 路线（LLM + SFT）。</li>
+<li>如果你的目标是<strong>图片转矢量</strong>（Image Tracing），选择 <strong>StarVector</strong> 路线。</li>
+<li>如果你的资源有限，想先跑通流程，从 <strong>DeepSVG</strong> + <strong>CLIP Finetuning</strong> 开始。</li>
+</ul>
+<hr />
+<h2 id="109">10.9 本章小结</h2>
+<ol>
+<li><strong>架构融合是趋势</strong>：最先进的模型（StarVector）不再单一依赖文本或图像，而是通过 Cross-Attention 机制融合视觉特征和序列特征。</li>
+<li><strong>坐标是核心难点</strong>：如何让神经网络理解“连续的坐标”？StarVector 选择了细粒度离散化，InternSVG 依赖 LLM 的文本回归，而 DiffVG 选择了可微优化。没有完美方案，只有权衡。</li>
+<li><strong>可微渲染作为 Loss</strong>：在训练 MLLM 时，仅仅监督 SVG 代码（Cross Entropy Loss）是不够的。引入 DiffVG 计算 Pixel Reconstruction Loss 或 Perceptual Loss 是提升视觉质量的关键 trick。</li>
+<li><strong>从“生成”到“编辑”</strong>：新一代工作的重点正从“从头生成”转向“基于指令的编辑”（如 ChatSVG），这更符合实际应用场景，也是 SVG-MLLM 的核心价值所在。</li>
+</ol>
+<hr />
+<h2 id="1010">10.10 练习题</h2>
+<h3 id="_1">基础题 (熟悉材料)</h3>
+<ol>
+<li><strong>架构辨析</strong>：StarVector 的 Visual Encoder 和 DeepSVG 的 Encoder 有什么本质区别？（提示：输入数据的模态）。</li>
+<li><strong>DiffVG 原理</strong>：简述 DiffVG 是如何解决光栅化过程中的“梯度消失/不可导”问题的？（提示：SDF 和平滑函数）。</li>
+<li><strong>LLM 局限性</strong>：为什么直接用 GPT-4 生成复杂 SVG 图像（如人像插画）通常效果不佳？请列举两个原因。</li>
+<li><strong>Tokenizer 对比</strong>：DeepSVG 使用 <code>&lt;COMMAND&gt;</code> 和 <code>&lt;COORD&gt;</code> 分开的词表，而某些新方法尝试将它们交错（Interleave）。这样做有什么潜在好处？</li>
+</ol>
+<h3 id="_2">挑战题 (开放性思考)</h3>
+<ol start="5">
+<li><strong>混合架构设计</strong>：设想你需要构建一个系统，用户输入“把这个图标变得更圆润一点”。你会如何结合 InternSVG（语义理解）和 DiffVG（几何优化）来实现？<ul>
+<li><em>Hint</em>: LLM 解析指令 -&gt; 修改参数 -&gt; DiffVG 验证曲率 -&gt; 迭代。</li>
+</ul>
+</li>
+<li><strong>Token 经济学</strong>：一张复杂的工程图可能包含 10,000 个坐标点，超出了 LLM 的 Context Window。请提出一种基于“层级化”或“压缩”的编码方案来解决这个问题。<ul>
+<li><em>Hint</em>: 宏观布局 (Group级) vs 微观路径 (Path级)；或者使用 VQ-VAE 压缩路径片段。</li>
+</ul>
+</li>
+<li><strong>Loss 函数设计</strong>：在训练 Image-to-SVG 模型时，如果只使用 L2 Pixel Loss，生成的 SVG 往往线条模糊或有伪影。结合本章内容，你应该添加什么 Loss 来强制生成的线条锐利且拓扑简洁？<ul>
+<li><em>Hint</em>: 路径长度正则化 (Parsimony Reward) + 拓扑约束。</li>
+</ul>
+</li>
+<li><strong>从像素到矢量</strong>：DiffVG 允许像素梯度的反传。如果利用这一点做“风格迁移”（例如把一张位图风格的 SVG 优化成手绘风格），你会优化哪些参数？（控制点位置？笔画宽度？颜色？）</li>
+</ol>
+<details>
+<summary>点击查看练习题答案提示</summary>
+<ol>
+<li><strong>StarVector vs DeepSVG</strong>: DeepSVG 的 Encoder 处理 SVG 文本序列；StarVector 的 Visual Encoder 处理栅格图像 (Pixels)，通过 ViT 提取视觉特征。</li>
+<li><strong>DiffVG</strong>: 引入有向距离场 (SDF) 和平滑近似函数 (如 Sigmoid)，使像素颜色相对于顶点坐标变得连续可导。</li>
+<li><strong>LLM 局限</strong>: 1. 缺乏空间感知能力 (Spatial Awareness)，不懂几何约束；2. 上下文长度限制，复杂 SVG token 太多；3. 训练数据中 SVG 代码通常是无渲染对应的纯文本，缺乏视觉对齐。</li>
+<li><strong>Token Interleave</strong>: 能够让模型更紧密地学习“命令”与“坐标”的依赖关系，减少序列长度，且符合 SVG 语法结构。</li>
+<li><strong>混合设计</strong>: 使用 LLM 将自然语言转换为“操作代码”（如 <code>modify_radius(path_id, +10%)</code>），或者生成初始 SVG，然后冻结拓扑结构，只用 DiffVG 优化控制点位置以平滑曲线。</li>
+<li><strong>Token 压缩</strong>: 方案 A - 两阶段生成，先生成 Layout (Box)，再在 Box 内生成 Path；方案 B - 学习一个 Path VAE，将常用的曲线片段（如圆角、直线）编码为单个 Token。</li>
+<li><strong>Loss 设计</strong>: L2 Loss (像素相似) + Chamfer Distance (几何轮廓相似) + Number of Segments Penalty (惩罚过多线段，鼓励简洁) + Path Length Regularization。</li>
+<li><strong>风格迁移</strong>: 优化控制点位置（产生抖动效果模拟手绘）、笔画宽度（Stroke width）、以及 Opacity。颜色通常保持不变或整体迁移。</li>
+</ol>
+</details>
+<hr />
+<h2 id="1011-gotchas">10.11 常见陷阱与错误 (Gotchas)</h2>
+<h3 id="1-coordinate-nightmare">1. 坐标归一化的混乱 (Coordinate Nightmare)</h3>
+<ul>
+<li><strong>现象</strong>：复现论文时，发现模型生成的图形总是挤在左上角，或者被拉伸变形。</li>
+<li><strong>原因</strong>：不同论文使用的归一化策略不同。有的归一化到 <code>[0, 1]</code>，有的到 <code>[-1, 1]</code>，有的基于 ViewBox，有的基于 Bounding Box。</li>
+<li><strong>Debug</strong>：在数据预处理阶段，强制将所有 SVG 的 <code>viewBox</code> 重写为 <code>0 0 256 256</code>（或其他固定值），并相应缩放所有 Path 命令的参数。不要相信原始数据的 ViewBox！</li>
+</ul>
+<h3 id="2-nan-diffvg-specific">2. "NaN" 梯度爆炸 (DiffVG Specific)</h3>
+<ul>
+<li><strong>现象</strong>：在使用 DiffVG 进行训练或优化时，Loss 突然变成 <code>NaN</code>。</li>
+<li><strong>原因</strong>：贝塞尔曲线的控制点重合（导致数学奇异点），或者笔画宽度为负数/零。</li>
+<li><strong>Trick</strong>：<ul>
+<li>在优化前，给所有控制点加微小的随机噪声。</li>
+<li>限制 Stroke Width 的最小值为 <code>1e-3</code> (ReLU + epsilon)。</li>
+<li>对梯度进行裁剪 (Gradient Clipping)。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-xml">3. XML 解析的脆弱性</h3>
+<ul>
+<li><strong>现象</strong>：模型生成的 Text 看似完美，但 <code>xml.etree</code> 解析报错。</li>
+<li><strong>原因</strong>：大模型喜欢“自创”闭合标签，或者忘记写 <code>&lt;/svg&gt;</code>。</li>
+<li><strong>Fix</strong>：不要直接以此判定生成失败。写一个“宽容”的 Parser，利用正则表达式提取 <code>d="..."</code> 属性，自动补全 XML 外壳。</li>
+</ul>
+<h3 id="4-fill-rule">4. 忽视了 <code>fill-rule</code></h3>
+<ul>
+<li><strong>现象</strong>：生成的圆环（Donut shape）中间被填满了，或者复杂的自交图形颜色反转。</li>
+<li><strong>原因</strong>：SVG 默认 <code>fill-rule="nonzero"</code>，而某些数据集（如字体）需要 <code>evenodd</code>。模型如果没学到这个属性，拓扑就会渲染错误。</li>
+<li><strong>建议</strong>：将 <code>fill-rule</code> 作为特殊的 Token 加入到词表中进行预测，或者在预处理时统一转换为一种格式。</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter9.html" class="nav-link prev">← 第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</a><a href="chapter11.html" class="nav-link next">第 11 章：SVG-MLLM 架构设计：理解与生成一体化 →</a></nav>
+        </main>
+    </div>
+</body>
+</html>
