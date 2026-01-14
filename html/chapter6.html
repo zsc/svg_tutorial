@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="6-svg-token-ast">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</h1>
+<h2 id="1">1. 开篇段落</h2>
+<p>在构建 SVG 生成模型时，我们面临一个根本性的矛盾：SVG 在<strong>存储</strong>上是 XML 文本，但在<strong>语义</strong>上是二维几何图形。
+如果我们简单粗暴地使用训练 GPT 的方式（如 Byte-Pair Encoding, BPE）处理 SVG 源码，模型将被迫把大量的算力浪费在学习“<code>&lt;</code> 后面通常跟什么字符”、“<code>3.14159</code> 是一个数字还是一串符号”这些低级语法上，而难以触及“闭合曲线”、“对称性”这些高级几何概念。</p>
+<p>本章的核心任务是建立一套高效的<strong>中间表示（Intermediate Representation, IR）</strong>。我们将深入解构 SVG 的三种主流建模方式：<strong>序列化 Token 流</strong>（适合 Transformer）、<strong>抽象语法树 AST</strong>（适合结构理解）和 <strong>拓扑图 Graph</strong>（适合复杂关系建模）。你将学会如何设计一套“词表”，让神经网络能够直接“说”几何语言，并掌握数据清洗中最关键的“规范化（Canonicalization）”流水线。</p>
+<hr />
+<h2 id="2">2. 文字论述</h2>
+<h3 id="21-nlp-tokenizer-svg">2.1 为什么标准 NLP Tokenizer 是 SVG 的“毒药”</h3>
+<p>在自然语言处理中，常用的 Tokenizer（如 WordPiece 或 BPE）是基于词频统计的。这在 SVG 场景下会失效，主要体现在三个方面：</p>
+<ol>
+<li><strong>数字碎片化</strong>：SVG 的本质是坐标。对于坐标 <code>d="M 123.45 ..."</code>，BPE 可能会将其切分为 <code>['12', '3', '.', '45']</code>。这导致两个严重后果：<ul>
+<li><strong>序列膨胀</strong>：一个简单的矩形可能变成上百个 Token。</li>
+<li><strong>数值语义丢失</strong>：模型很难理解 <code>['1']</code> 和 <code>['0']</code> 的组合（<code>10</code>）在数值上比 <code>['9']</code> 大。</li>
+</ul>
+</li>
+<li><strong>XML 冗余噪声</strong>：<code>&lt;path stroke="#000000" stroke-width="1" ...&gt;</code> 包含了大量对于几何形状本身“低信噪比”的字符。</li>
+<li><strong>几何隐喻的缺失</strong>：在文本层面，<code>M</code>（MoveTo）只是一个字母，但在几何层面，它意味着“抬笔移动”。通用语言模型很难建立这种“字符-动作”的强绑定。</li>
+</ol>
+<h3 id="22-tokenizer-geometric-tokenization">2.2 核心方案：自定义几何 Tokenizer (Geometric Tokenization)</h3>
+<p>为了解决上述问题，SOTA（State-of-the-Art）模型（如 DeepSVG, IconShop）通常采用<strong>专用词表</strong>。</p>
+<h4 id="221-vocabulary-design">2.2.1 词表构成 (Vocabulary Design)</h4>
+<p>一个典型的 SVG Tokenizer 词表通常包含以下几类 Token（总数通常在 500 ~ 2000 之间）：</p>
+<ol>
+<li><strong>命令 Token (Command Tokens)</strong>：<ul>
+<li>直接对应 SVG Path 指令：<code>&lt;M&gt;</code>, <code>&lt;L&gt;</code>, <code>&lt;C&gt;</code> (三次贝塞尔), <code>&lt;Q&gt;</code> (二次贝塞尔), <code>&lt;A&gt;</code> (圆弧), <code>&lt;Z&gt;</code> (闭合)。</li>
+<li><strong>Rule-of-Thumb</strong>：通常将绝对指令（<code>L</code>）和相对指令（<code>l</code>）分开编码，或者统一转换为一种。</li>
+</ul>
+</li>
+<li><strong>坐标 Token (Coordinate Tokens)</strong>：<ul>
+<li>这是词表的主体。我们将连续的浮点坐标空间映射为离散的整数索引。</li>
+<li>例如：定义画布范围 $[0, 255]$，精度为 1（整数）。那么坐标 <code>10.3</code> 对应 Token <code>&lt;10&gt;</code>。</li>
+<li>如果需要更高精度，可以将范围设为 $[0, 1023]$。</li>
+</ul>
+</li>
+<li><strong>特殊 Token (Special Tokens)</strong>：<ul>
+<li>结构标识：<code>&lt;SOS&gt;</code> (Start), <code>&lt;EOS&gt;</code> (End), <code>&lt;SEP&gt;</code> (Path 分隔符)。</li>
+<li>层级标识：<code>&lt;GROUP_START&gt;</code>, <code>&lt;GROUP_END&gt;</code>（如果需要建模 Group）。</li>
+</ul>
+</li>
+</ol>
+<h4 id="222-serialization">2.2.2 序列化策略 (Serialization)</h4>
+<p>如何将 Path <code>d="M 10 20 L 30 40"</code> 转换为 Token ID 序列？</p>
+<ul>
+<li>
+<p><strong>方案 A：交错式 (Interleaved)</strong></p>
+<ul>
+<li>格式：<code>[CMD, X, Y, CMD, X, Y, ...]</code></li>
+<li>序列：<code>&lt;M&gt;, &lt;10&gt;, &lt;20&gt;, &lt;L&gt;, &lt;30&gt;, &lt;40&gt;</code></li>
+<li>优点：最直观，符合 SVG 原始语序。</li>
+<li>缺点：X 和 Y 共享同一个坐标词表，模型需要自己学习“奇数位是X，偶数位是Y”。</li>
+</ul>
+</li>
+<li>
+<p><strong>方案 B：三元组式 (Triplet / Vectorized)</strong></p>
+<ul>
+<li>不再预测单一 Token，而是每一步预测一个向量 <code>(cmd_id, x_id, y_id)</code>。</li>
+<li>优点：序列长度缩短 3 倍，推理速度快。</li>
+<li>缺点：需要修改 Transformer 的 Embedding 层结构（支持多头输入）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="23-ast-dom">2.3 AST 与 DOM：处理复杂结构的利器</h3>
+<p>简单的 Path 序列无法处理复杂的 SVG（如包含 <code>defs</code>, <code>clipPath</code>, <code>mask</code> 的图）。这时我们需要 <strong>AST（抽象语法树）</strong>。</p>
+<h4 id="231">2.3.1 树结构定义</h4>
+<ul>
+<li><strong>根节点</strong>：Document Root。</li>
+<li><strong>容器节点</strong>：<code>&lt;g&gt;</code> (Group), <code>&lt;defs&gt;</code>。主要属性是 <code>transform</code> 和 <code>style</code>。</li>
+<li><strong>叶子节点</strong>：<code>&lt;path&gt;</code>, <code>&lt;rect&gt;</code>, <code>&lt;circle&gt;</code>, <code>&lt;text&gt;</code>。</li>
+<li><strong>引用节点</strong>：<code>&lt;use&gt;</code>。这是图结构的来源，它指向 <code>defs</code> 中的某个节点。</li>
+</ul>
+<h4 id="232-flattening-vs">2.3.2 扁平化 (Flattening) vs. 结构保持</h4>
+<p>在训练生成模型时，我们面临一个权衡：</p>
+<ol>
+<li>
+<p><strong>完全扁平化 (Full Instantiation)</strong>：</p>
+<ul>
+<li>将所有 <code>&lt;use&gt;</code> 展开为实体。</li>
+<li>将所有 <code>&lt;g&gt;</code> 的 <code>transform</code> 矩阵乘到子节点的坐标上，并移除 <code>&lt;g&gt;</code>。</li>
+<li>将 <code>&lt;rect&gt;</code> 等形状转换为 <code>&lt;path&gt;</code>。</li>
+<li><strong>结果</strong>：一个 SVG 变成了一个纯粹的 <code>&lt;path&gt;</code> 列表。</li>
+<li><strong>适用场景</strong>：<strong>Text-to-SVG 生成任务</strong>。模型只需要学会画线，不需要学会复杂的 XML 引用逻辑。</li>
+</ul>
+</li>
+<li>
+<p><strong>结构保持</strong>：</p>
+<ul>
+<li>保留 Group 和 Transform。</li>
+<li><strong>适用场景</strong>：<strong>UI 代码生成、SVG 编辑任务</strong>。用户希望保留图层结构，而不是得到一堆打散的路径。</li>
+</ul>
+</li>
+</ol>
+<h3 id="24-the-canonicalization-pipeline">2.4 数据规范化流水线 (The Canonicalization Pipeline)</h3>
+<p>这是本章<strong>最重要</strong>的工程部分。如果不进行规范化，模型将无法收敛。一个标准的 SVG 预处理流水线如下：</p>
+<ol>
+<li><strong>清洗 (Sanitization)</strong>：<ul>
+<li>移除 <code>script</code>, <code>style</code> (CSS block), <code>metadata</code>。</li>
+<li>移除不可见元素（<code>display="none"</code>, <code>opacity="0"</code>, 极小面积的 path）。</li>
+</ul>
+</li>
+<li><strong>图元转换 (Primitive Conversion)</strong>：<ul>
+<li>SVG 有多种画矩形的方法：<code>&lt;rect&gt;</code>, <code>&lt;path&gt;</code>, <code>&lt;polygon&gt;</code>。</li>
+<li><strong>强制统一</strong>：将 <code>&lt;rect&gt;</code>, <code>&lt;circle&gt;</code>, <code>&lt;ellipse&gt;</code>, <code>&lt;line&gt;</code>, <code>&lt;polyline&gt;</code>, <code>&lt;polygon&gt;</code> 全部转换为 <code>&lt;path&gt;</code> 数据。</li>
+<li><em>为什么？</em> 减少词表大小，模型只需专注学习 Path 语言。</li>
+</ul>
+</li>
+<li><strong>变换烘焙 (Transform Baking)</strong>：<ul>
+<li>如果 <code>&lt;g transform="rotate(45)"&gt; &lt;path ... /&gt; &lt;/g&gt;</code>，通过矩阵运算将旋转应用到 path 的每个坐标点上，然后移除 group 标签。</li>
+<li>确保坐标是“最终渲染坐标”。</li>
+</ul>
+</li>
+<li>
+<p><strong>视口归一化 (Viewport Normalization)</strong>：</p>
+<ul>
+<li>读取 <code>viewBox="x y w h"</code>。</li>
+<li>将所有坐标点 $(p_x, p_y)$ 映射到单位空间 $[0, 1]$ 或目标整数空间 $[0, 255]$：
+    $$ x' = \frac{x - \text{viewBox}.x}{\text{viewBox}.w} \times 255 $$</li>
+</ul>
+</li>
+<li>
+<p><strong>Path 命令简化</strong>：</p>
+<ul>
+<li>将所有相对命令（<code>l</code>, <code>c</code>）转为绝对命令（<code>L</code>, <code>C</code>），或者反之。</li>
+<li>将 <code>H</code> (水平线), <code>V</code> (垂直线) 统一转为 <code>L</code>。</li>
+<li>将 <code>S</code>, <code>T</code> (简写贝塞尔) 展开为完整的 <code>C</code>, <code>Q</code>。</li>
+<li><strong>目的</strong>：极度简化语法，让模型只面对 <code>M, L, C, Z</code> 四种核心指令。</li>
+</ul>
+</li>
+</ol>
+<h3 id="25-graph-representation">2.5 图表示 (Graph Representation)</h3>
+<p>对于需要理解<strong>拓扑关系</strong>的任务（如：修改流程图的连接、编辑地图），简单的序列表示会丢失空间邻接信息。我们可以构建一个图 $G=(V, E)$：</p>
+<ul>
+<li><strong>节点 (Nodes)</strong>：每个 <code>&lt;path&gt;</code> 是一个节点。节点特征包含：颜色、线宽、边界框 (BBox)、语义标签。</li>
+<li><strong>边 (Edges)</strong>：<ul>
+<li><strong>包含边</strong>：如果是 Group 结构，父子相连。</li>
+<li><strong>空间邻近边</strong>：如果两个 Path 的 BBox IOU &gt; 0 或距离很近，连边。</li>
+<li><strong>视觉相似边</strong>：颜色/线型相同的节点连边。</li>
+</ul>
+</li>
+</ul>
+<p>这种表示法通常配合 <strong>GNN (Graph Neural Networks)</strong> 或 <strong>Graph Transformer</strong> 使用。</p>
+<h3 id="26-validity-constraints">2.6 几何合法性与约束 (Validity &amp; Constraints)</h3>
+<p>生成的 SVG 必须是“合法”的。</p>
+<ul>
+<li><strong>语法合法</strong>：XML 标签闭合。</li>
+<li><strong>Path 合法</strong>：<ul>
+<li><code>M</code> 后面必须跟坐标。</li>
+<li><code>C</code> 命令必须跟 3 对坐标（控制点1，控制点2，终点）。</li>
+<li>Path 至少包含 2 个点。</li>
+</ul>
+</li>
+<li><strong>几何合法</strong>（更高级）：<ul>
+<li>避免<strong>自交 (Self-intersection)</strong>：蝴蝶结形状的填充通常是不被期望的。</li>
+<li><strong>流形闭合</strong>：如果填充了颜色，路径最好显式闭合 (<code>Z</code>)。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3">3. 本章小结</h2>
+<ul>
+<li><strong>Tokenizer 是核心</strong>：不要使用 NLP BPE。构建包含 <code>&lt;CMD&gt;</code>, <code>&lt;COORD_INT&gt;</code> 的专用几何词表。</li>
+<li><strong>坐标离散化</strong>：将连续浮点数映射为 256 或 1024 个整数 bin，将回归问题转化为分类问题。</li>
+<li><strong>规范化 (Canonicalization)</strong>：训练前的“必修课”。包括：图元转 Path、变换下推（Baking）、视口归一化、指令简化。</li>
+<li><strong>表示的选择</strong>：<ul>
+<li><em>生成任务</em>：推荐使用 <strong>扁平化 Path 序列 + 相对坐标</strong>。</li>
+<li><em>编辑/理解任务</em>：推荐使用 <strong>AST 树结构 + 绝对坐标</strong>。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="4">4. 练习题</h2>
+<h3 id="_1">基础题</h3>
+<ol>
+<li><strong>变换烘焙 (Transform Baking) 计算</strong>
+给定一个点 $P(10, 0)$ 和一个父级变换 <code>transform="translate(20, 10) scale(2, 2)"</code>。
+请计算变换应用后，$P$ 点的最终绝对坐标。</li>
+</ol>
+<details>
+<summary><em>点击查看提示</em></summary>
+<p>SVG 变换顺序通常是从右向左（或者理解为先 Scale 后 Translate）。矩阵公式：$T \times S \times P$。</p>
+</details>
+<details>
+<summary><em>点击查看答案</em></summary>
+<p>先缩放：$x' = 10 \times 2 = 20, y' = 0 \times 2 = 0$。
+再平移：$x'' = 20 + 20 = 40, y'' = 0 + 10 = 10$。
+最终坐标：$(40, 10)$。</p>
+</details>
+<ol start="2">
+<li><strong>简写指令展开</strong>
+SVG 的 <code>h</code> 指令表示水平相对移动。
+给定当前点 $(50, 50)$，指令序列 <code>h 10 v 20</code>。请将其转换为标准的绝对坐标 <code>L</code> 指令序列。</li>
+</ol>
+<details>
+<summary><em>点击查看提示</em></summary>
+<p><code>h dx</code> -&gt; <code>L (current_x + dx) current_y</code>。
+<code>v dy</code> -&gt; <code>L current_x (current_y + dy)</code>。</p>
+</details>
+<details>
+<summary><em>点击查看答案</em></summary>
+<ol>
+<li><code>h 10</code>: 当前 $(50, 50)$ -&gt; 新点 $(50+10, 50) = (60, 50)$。对应指令 <code>L 60 50</code>。</li>
+<li><code>v 20</code>: 当前 $(60, 50)$ -&gt; 新点 $(60, 50+20) = (60, 70)$。对应指令 <code>L 60 70</code>。
+结果：<code>L 60 50 L 60 70</code>。</li>
+</ol>
+</details>
+<ol start="3">
+<li><strong>ViewBox 归一化</strong>
+原始 SVG <code>viewBox="0 0 100 50"</code>。其中有一个点 $(50, 25)$。
+如果我们将其归一化到 $256 \times 256$ 的整数空间，该点的坐标 $(x_{int}, y_{int})$ 是多少？注意保持长宽比（Aspect Ratio）的处理。</li>
+</ol>
+<details>
+<summary><em>点击查看提示</em></summary>
+<p>通常做法是：按长边缩放，短边留白（padding）；或者直接拉伸（破坏长宽比）。这里假设“拉伸填满”以简化计算。</p>
+</details>
+<details>
+<summary><em>点击查看答案</em></summary>
+<p>(假设拉伸填满策略)
+$x_{int} = (50 - 0) / 100 \times 255 = 127.5 \approx 128$
+$y_{int} = (25 - 0) / 50 \times 255 = 127.5 \approx 128$
+结果：$(128, 128)$</p>
+</details>
+<h3 id="_2">挑战题</h3>
+<ol start="4">
+<li><strong>思考题：隐式命令 (Implicit Commands) 的处理</strong>
+SVG 语法允许 <code>L 10 10 20 20</code>，这等价于 <code>L 10 10 L 20 20</code>。即如果命令后跟随了多组参数，默认重复该命令。
+在设计 Tokenizer 时，你应该：
+A. 强制补全所有命令（显式化）。
+B. 允许模型输出这种隐式格式。
+请分析 A 和 B 对模型训练稳定性的影响。</li>
+</ol>
+<details>
+<summary><em>点击查看提示</em></summary>
+<p>考虑“对齐”问题。显式结构更规整，隐式结构更紧凑。</p>
+</details>
+<details>
+<summary><em>点击查看答案</em></summary>
+<p><strong>推荐选择 A（强制补全/显式化）：</strong>
+虽然 B 节省了 Token，但它增加了语法的上下文依赖性（模型必须记住 10 个 Token 之前的命令是什么）。
+显式化 <code>L 10 10 L 20 20</code> 让每个坐标组都是自包含的，极大降低了模型注意力机制的学习难度，减少“错位”风险。</p>
+</details>
+<ol start="5">
+<li><strong>算法设计：Token 反量化 (De-quantization) 策略</strong>
+你训练了一个模型，输出 $[0, 255]$ 的坐标 Token。直接转换回浮点数会产生明显的“台阶效应”（锯齿）。
+设计一个后处理算法或解码策略，从概率分布中恢复更高精度的坐标。</li>
+</ol>
+<details>
+<summary><em>点击查看提示</em></summary>
+<p>不要只看 argmax。看看 argmax 左右两侧的概率。</p>
+</details>
+<details>
+<summary><em>点击查看答案</em></summary>
+<p>可以使用 <strong>期望值解码 (Expected Value Decoding)</strong> 或 <strong>亚像素插值</strong>。
+假设模型输出 logits，对坐标 $i$ 的概率为 $p_i$。
+不取 $k = \text{argmax}(p)$，而是计算局部期望：
+$coordinate = \sum_{j=k-1}^{k+1} j \times p_j / \sum p_j$
+这就利用了模型对相邻 bin 的不确定性来插值出小数位，从而获得比 grid 更平滑的线条。</p>
+</details>
+<ol start="6">
+<li><strong>开放设计：多模态对齐的 Token 设计</strong>
+如果我们要训练一个 SVG 模型，不仅能画图，还能在图中插入 <code>&lt;text&gt;</code>。
+文字内容（如 "Hello"）应该如何 Tokenize？是使用专门的 SVG 词表，还是借用 LLM (如 Llama) 的 Tokenizer？如果是混合词表，如何处理 Embedding 空间的对齐？</li>
+</ol>
+<details>
+<summary><em>点击查看提示</em></summary>
+<p>这是 MLLM 设计的经典难题。考虑 "Special Tokens" 作为模态切换开关。</p>
+</details>
+<details>
+<summary><em>点击查看答案</em></summary>
+<p><strong>混合词表策略</strong>：</p>
+<ol>
+<li>保留 LLM 的原始词表（例如 32k 大小）。</li>
+<li>扩充 SVG 专用 Token（如 <code>&lt;CMD_M&gt;</code>, <code>&lt;COORD_10&gt;</code>）。</li>
+<li>Embedding 对齐：从头训练 SVG Token 的 embedding，冻结或微调 LLM embedding。</li>
+<li>模态切换：当预测到 <code>&lt;tag_text&gt;</code> 时，模型切换到自然语言模式；当预测到 <code>&lt;tag_path&gt;</code> 时，切换到几何模式。</li>
+</ol>
+</details>
+<hr />
+<h2 id="5-gotchas">5. 常见陷阱与错误 (Gotchas)</h2>
+<h3 id="1-z">1. <code>Z</code> 指令的“回马枪”</h3>
+<ul>
+<li><strong>现象</strong>：模型生成的闭合形状在最后一条边出现奇怪的交叉或缺口。</li>
+<li><strong>原因</strong>：SVG 的 <code>Z</code> 指令表示“回到子路径起点”。如果模型之前的坐标预测有累积误差，起点和终点即使数值上接近，视觉上也可能产生裂缝。</li>
+<li><strong>调试</strong>：在规范化阶段，如果检测到 <code>Z</code>，可以将最后一段 <code>L</code> 指令移除（因为 <code>Z</code> 隐含了最后一段连线），强制由渲染引擎来负责闭合，保证完美的连接。</li>
+</ul>
+<h3 id="2-drift">2. 相对坐标的“漂移” (Drift)</h3>
+<ul>
+<li><strong>现象</strong>：生成长序列（如复杂的地图轮廓）时，图形越到后面越歪，或者跑出了画布。</li>
+<li><strong>原因</strong>：这是自回归模型 + 相对坐标的通病。每一步 $0.1$ 的预测误差，累积 100 步后就是巨大的偏移。</li>
+<li><strong>解决</strong>：<ol>
+<li>训练时混合使用绝对坐标（用于锚点）和相对坐标（用于细节）。</li>
+<li>或者在 Loss 函数中加入“全局形状重构 Loss”，而不仅仅是“下一步预测 Loss”。</li>
+</ol>
+</li>
+</ul>
+<h3 id="3-arc">3. <code>arc</code> (椭圆弧) 指令的复杂性</h3>
+<ul>
+<li><strong>现象</strong>：模型极难学会 <code>&lt;path d="... A 10 10 0 0 1 ..."&gt;</code>。生成的圆弧经常方向反了，或者变成了直线。</li>
+<li><strong>原因</strong>：<code>A</code> 指令包含 7 个参数（半径x, 半径y, 旋转, 大弧标志, 顺逆时针标志, 终点x, 终点y）。其中“大弧标志”和“顺逆时针”是布尔值，对几何形状影响是突变的（非连续）。</li>
+<li><strong>Rule-of-Thumb</strong>：<strong>不要让模型直接预测 <code>A</code> 指令</strong>。在预处理阶段，使用几何库将所有 <code>A</code> 指令近似拟合为 1~2 个三次贝塞尔曲线 (<code>C</code>)。<code>C</code> 指令更加平滑，更易于神经网络学习。</li>
+</ul>
+<h3 id="4-locale">4. 浮点数解析器的区域设置 (Locale) 问题</h3>
+<ul>
+<li><strong>陷阱</strong>：在某些服务器或语言设置下，浮点数用逗号 <code>,</code> 分隔（如 <code>3,14</code>），而 SVG 标准强制使用点 <code>.</code>。</li>
+<li><strong>后果</strong>：如果你使用简单的 <code>float()</code> 进行转换且未指定 locale，可能导致数据清洗阶段大量数据被丢弃或数值错误。</li>
+<li><strong>建议</strong>：始终硬编码小数点符号处理，不要依赖系统的 locale 设置。</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter5.html" class="nav-link prev">← [第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</a><a href="chapter7.html" class="nav-link next">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

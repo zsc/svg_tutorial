@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="5-image-tracing"><a href="chapter5.html">第 5 章：传统矢量化与图像追踪（Image Tracing）算法</a></h1>
+<h2 id="1">1. 开篇段落：从像素的客观事实到矢量的几何猜想</h2>
+<p>在人类看来，一张低分辨率的图片中的“圆形”是显而易见的。但在计算机视觉的底层，并没有“圆”这个概念，只有一网格离散的像素点（Raster）。<strong>矢量化（Vectorization）</strong>，或称图像追踪（Image Tracing），本质上是一个<strong>逆向重建问题</strong>：试图从离散的、有损的像素采样中，恢复出连续的、数学化的几何描述。</p>
+<p>对于 SVG-MLLM 项目而言，本章是数据工程的基石。目前的互联网上缺乏高质量的 <code>(Image, SVG Code)</code> 配对数据。绝大多数研究（如 DeepSVG, IconShop）都依赖传统算法将大量位图转化为矢量图来构造预训练语料。</p>
+<p><strong>学习目标</strong>：</p>
+<ol>
+<li><strong>解构管线</strong>：深入理解从位图预处理到曲线拟合的工业级标准流程（Potrace/AutoTrace 范式）。</li>
+<li><strong>核心算法</strong>：掌握二值化（Otsu）、轮廓提取、RDP 简化与贝塞尔拟合的数学直觉。</li>
+<li><strong>模式差异</strong>：区分“轮廓追踪”（Outline/Fill）与“中心线追踪”（Centerline/Stroke）的本质区别及适用场景。</li>
+<li><strong>数据洞察</strong>：识别传统算法生成 SVG 的特征性缺陷（如无语义堆叠、碎片化），为 MLLM 的训练目标设计提供依据。</li>
+</ol>
+<hr />
+<h2 id="2">2. 文字论述：矢量化的标准工业管线</h2>
+<p>一个成熟的图像追踪引擎（如 Inkscape 内部机制）并非一步到位，而是由一系列信号处理步骤组成的流水线。</p>
+<h3 id="21">2.1 阶段一：预处理（让机器看清形状）</h3>
+<p>输入图像往往充满噪点、压缩伪影（Artifacts）和渐变色，直接追踪会产生数以万计的无意义微小路径（Path Explosion）。</p>
+<ol>
+<li>
+<p><strong>去噪与平滑 (Denoising)</strong>：</p>
+<ul>
+<li><strong>高斯模糊</strong>：去除高频噪点，但会模糊边缘。</li>
+<li><strong>双边滤波 (Bilateral Filter)</strong>：<strong>Rule of Thumb</strong> 的首选。它能保留边缘（Edge-preserving）的同时去除平坦区域的噪点，这对提取清晰轮廓至关重要。</li>
+<li><strong>形态学操作</strong>：开运算（先腐蚀后膨胀）用于去除孤立的亮斑；闭运算（先膨胀后腐蚀）用于填补图形内部的小黑洞。</li>
+</ul>
+</li>
+<li>
+<p><strong>二值化 (Binarization)</strong>：</p>
+<ul>
+<li>SVG 的 <code>&lt;path&gt;</code> 是硬边界，像素必须被划分为“内”或“外”。</li>
+<li><strong>全局阈值</strong>：选定一个 0-255 的值，一刀切。</li>
+<li><strong>大津法 (Otsu's Method)</strong>：自动寻找最佳阈值，使得前景和背景的类间方差最大。对于黑白分明的图标效果极佳。</li>
+<li><strong>自适应阈值 (Adaptive Thresholding)</strong>：根据像素局部的邻域计算阈值。适合光照不均匀的扫描文档（如左边亮右边暗的纸张）。</li>
+</ul>
+</li>
+<li>
+<p><strong>色彩量化 (Color Quantization)</strong>：</p>
+<ul>
+<li>如果是彩色图片，必须先降维。通常使用 <strong>K-Means 聚类</strong>将全图颜色减少到 $K$ 种（例如 16 色）。</li>
+<li><strong>分层策略</strong>：将图片分解为 $K$ 张黑白位图（每一张代表一种颜色），分别进行追踪，最后叠加。</li>
+</ul>
+</li>
+</ol>
+<h3 id="22">2.2 阶段二：轮廓提取（在迷宫中行走）</h3>
+<p>现在我们有了一张只有 0 和 1 的黑白图。目标是将像素的边缘转化为有序的坐标点列表。</p>
+<ul>
+<li>
+<p><strong>摩尔邻域算法 (Moore-Neighbor Tracing)</strong>：
+    想象一个机器人站在黑色像素上。它按照顺时针方向检查周围的 8 个邻居像素。一旦找到一个黑色像素，就移动过去并重复此过程。</p>
+</li>
+<li>
+<p><strong>拓扑结构 (Topology)</strong>：
+    不仅仅是外轮廓，还需要识别“洞”（Holes）。算法通常输出一个树状结构（Tree of Paths）：</p>
+<ul>
+<li>根节点：画布</li>
+<li>子节点：外轮廓（黑色）</li>
+<li>孙节点：内部挖空（白色）</li>
+<li>曾孙节点：挖空内部的孤岛（黑色）</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>Rule of Thumb</strong>：在这个阶段提取出的路径全是“曼哈顿阶梯”，即由水平和垂直短线组成的锯齿状路径。坐标点数量 $\approx$ 图像分辨率的周长，数据量巨大。</p>
+</blockquote>
+<h3 id="23-rdp">2.3 阶段三：路径简化（RDP 算法）</h3>
+<p>这是数据压缩的关键一步。我们需要把几千个像素点简化为几十个关键特征点。<strong>Ramer-Douglas-Peucker (RDP)</strong> 算法是该领域的标准。</p>
+<p><strong>算法直觉</strong>：</p>
+<ol>
+<li>想象一条橡皮筋连接曲线的首尾。</li>
+<li>找到曲线上离橡皮筋“最远”的那个点。</li>
+<li>如果这个距离小于设定的阈值 $\epsilon$（Epsilon），说明这一段曲线近似于直线，中间所有点都可以丢弃。</li>
+<li>如果距离大于 $\epsilon$，则保留该点，像钉钉子一样把橡皮筋钉住，然后对两边的线段递归执行此过程。</li>
+</ol>
+<div class="codehilite"><pre><span></span><code>ASCII 演示 RDP 简化过程：
+
+Step 1: 原始像素点 (X) 与首尾连线 (---)
+    X
+   / \       &lt;-- 距离 d &gt; Epsilon，保留顶点
+  X   X
+ /     \
+S-------E
+
+Step 2: 递归处理左边，若中间点距离连线很近
+      X
+     / \
+    X---X    &lt;-- 距离 d &lt; Epsilon，丢弃中间点，直接拉直
+   /
+  S
+
+结果：保留了关键拐角，丢弃了直线上的冗余像素。
+</code></pre></div>
+
+<h3 id="24">2.4 阶段四：曲线拟合（从折线到贝塞尔）</h3>
+<p>SVG 的灵魂在于 Cubic Bézier 曲线。此阶段将 RDP 输出的折线段转化为平滑曲线。</p>
+<ol>
+<li>
+<p><strong>角点检测 (Corner Detection)</strong>：
+    并非所有点都要平滑。如果三个点的夹角非常锐利（如 &lt; 135°），则该点被标记为“角点”（Corner），曲线必须在此打断，使用 <code>L</code> 命令或不连续的控制点。</p>
+</li>
+<li>
+<p><strong>切线估计</strong>：
+    对于非角点，根据其前后点的坐标估算切线方向。</p>
+</li>
+<li>
+<p><strong>最小二乘法拟合</strong>：
+    在两个端点之间，寻找两个控制点 $(P_1, P_2)$，使得生成的贝塞尔曲线与原像素路径的垂直距离平方和最小。</p>
+</li>
+<li>
+<p><strong>错误能量与分裂</strong>：
+    如果拟合后的曲线与原路径误差仍然过大，算法会在误差最大的位置插入一个新的节点，将曲线一分为二重新拟合。</p>
+</li>
+</ol>
+<hr />
+<h2 id="3-vs">3. 两种核心范式：轮廓 vs. 骨架</h2>
+<p>在 SVG-MLLM 的应用场景中，必须区分两种截然不同的矢量化逻辑。</p>
+<h3 id="31-outline-tracing-potrace">3.1 轮廓追踪 (Outline Tracing / Potrace)</h3>
+<ul>
+<li><strong>原理</strong>：沿着黑色区域的<strong>边缘</strong>行走。</li>
+<li><strong>产物</strong>：封闭的形状（Filled Shapes）。</li>
+<li><strong>例子</strong>：画一条粗线，Potrace 会生成一个长条形的矩形路径，通过 <code>fill</code> 属性填充颜色。</li>
+<li><strong>适用</strong>：Logo、图标、版画、剪影。</li>
+<li><strong>现有工具</strong>：Potrace (Inkscape), Vector Magic。</li>
+<li><strong>MLLM 视角</strong>：这是目前大部分训练数据（如 DeepSVG 数据集）的形态。</li>
+</ul>
+<h3 id="32-centerline-tracing-skeletonization">3.2 中心线追踪 (Centerline Tracing / Skeletonization)</h3>
+<ul>
+<li><strong>原理</strong>：通过<strong>细化算法 (Thinning/Zhang-Suen Algorithm)</strong> 不断腐蚀黑色像素，直到只剩下一个像素宽的骨架，然后将骨架转化为路径。</li>
+<li><strong>产物</strong>：开放的线条（Stroked Paths）。</li>
+<li><strong>例子</strong>：画一条粗线，生成一条单线路径，通过 <code>stroke-width</code> 属性控制粗细。</li>
+<li><strong>适用</strong>：手写文字、工程制图 (CAD)、素描草图。</li>
+<li><strong>难点</strong>：交叉点（Junction points）处理极难。比如“十”字路口，骨架化后容易变成扭曲的形状。</li>
+<li><strong>MLLM 视角</strong>：这更符合人类绘画的逻辑（Stroke-based），也是 SketchRNN 等生成模型的目标，但获取高质量的训练数据非常困难。</li>
+</ul>
+<hr />
+<h2 id="4-mllm">4. 传统算法的系统性缺陷（MLLM 的机会）</h2>
+<p>理解传统算法做不到什么，就是理解为什么我们需要训练一个 AI 模型来做这件事。</p>
+<ol>
+<li>
+<p><strong>缺乏语义层级 (No Semantic Hierarchy)</strong>：</p>
+<ul>
+<li>传统算法输出的 SVG 是一堆“平铺”的碎片。它不懂“这是一只被树遮挡的猫”。它会把猫切成两半，中间挖空。</li>
+<li><strong>MLLM 目标</strong>：生成完整的猫和完整的树，利用 SVG 的图层顺序（Z-order）处理遮挡。</li>
+</ul>
+</li>
+<li>
+<p><strong>过度拟合噪点 (Over-fitting Noise)</strong>：</p>
+<ul>
+<li>位图上的污渍会被忠实地追踪成一个形状。</li>
+<li><strong>MLLM 目标</strong>：学习“去噪生成”，忽略非几何的视觉噪声。</li>
+</ul>
+</li>
+<li>
+<p><strong>几何正则化缺失 (Lack of Regularity)</strong>：</p>
+<ul>
+<li>一个手绘的歪歪扭扭的圆，传统算法会生成一个歪歪扭扭的 <code>&lt;path&gt;</code>。</li>
+<li><strong>MLLM 目标</strong>：识别出意图是“圆”，直接生成 <code>&lt;circle&gt;</code> 标签，实现设计稿的规整化。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="5">5. 本章小结</h2>
+<ul>
+<li><strong>逆问题的本质</strong>：从 Raster 到 Vector 是试图从有限信息中恢复无限精度的过程，必须依赖平滑性假设。</li>
+<li><strong>关键算法链</strong>：预处理（去噪）→ 轮廓提取（Moore）→ 简化（RDP）→ 拟合（贝塞尔）。每一个环节的参数都影响最终 Token 的数量和质量。</li>
+<li><strong>RDP 是核心</strong>：它决定了 SVG 是“精细但巨大”还是“抽象且轻量”。</li>
+<li><strong>数据形态</strong>：现有的大规模 SVG 数据集大多由 Potrace 类算法生成，因此充满了 <code>path</code> 填充而非 <code>stroke</code> 描边，且缺乏遮挡关系。这是训练 SVG-MLLM 时必须正视的数据偏置（Data Bias）。</li>
+</ul>
+<hr />
+<h2 id="6">6. 练习题</h2>
+<h3 id="_1">基础题</h3>
+<p><strong>Q1: 贝塞尔控制点的物理意义</strong>
+在曲线拟合阶段，如果将一个 Cubic Bézier 曲线的两个控制点都拉得离端点非常远，曲线的形状会发生什么变化？这在拟合尖锐转角时可能导致什么问题？</p>
+<details>
+<summary>点击查看提示 (Hint)</summary>
+<p>控制点距离代表“速度”或“张力”。拉得过远会导致曲线产生自交（Loop）或剧烈的过冲（Overshoot），就像赛车过弯速度太快冲出了赛道。</p>
+</details>
+<p><strong>Q2: 阈值对 Token 数量的影响</strong>
+假设你使用 RDP 算法处理一张 1024x1024 的图片。如果将 $\epsilon$ 从 1.0 提高到 5.0，最终生成的 SVG 文件大小（及 Token 数）大概会呈什么趋势变化？为什么？</p>
+<details>
+<summary>点击查看提示 (Hint)</summary>
+<p>呈反比急剧下降。$\epsilon$ 增加意味着容忍更大的误差，更多的中间点被丢弃，<code>&lt;path&gt;</code> 命令中的坐标对减少，Token 数量显著降低。</p>
+</details>
+<p><strong>Q3: 二值化的挑战</strong>
+对于一张白纸上用铅笔写的字（对比度低，且光照不均），为什么全局阈值（Global Threshold）效果很差？应该改用什么算法？</p>
+<details>
+<summary>点击查看提示 (Hint)</summary>
+<p>全局阈值无法兼顾亮处的背景和暗处的字。应使用自适应阈值（Adaptive Threshold），它根据每个像素周围小窗口的平均亮度来动态决定阈值。</p>
+</details>
+<h3 id="_2">挑战题</h3>
+<p><strong>Q4: 伪像消除 (Artifact Removal)</strong>
+JPEG 压缩会在物体边缘产生“振铃效应”（Ringing artifacts）。如果直接对 JPEG 图片进行追踪，SVG 边缘会充满细碎的波浪。请提出一种预处理流水线来缓解这个问题。</p>
+<details>
+<summary>点击查看提示 (Hint)</summary>
+<p>JPEG 伪像通常是高频噪声。流水线：双边滤波（磨皮保留边缘） -&gt; 适度的形态学开运算（去除微小孤岛） -&gt; 在 RDP 阶段适当调大 $\epsilon$（忽略微小波动）。</p>
+</details>
+<p><strong>Q5: 思考题：从 Potrace 到 MLLM 的数据清洗</strong>
+如果你有一百万个由 Potrace 生成的 SVG 数据，用来训练 MLLM 生成可编辑图标。你会发现 Potrace 经常把一个“同心圆环”生成为“一个 Path 里面包含两个 Sub-path（利用奇偶填充规则挖空）”。
+为了让 MLLM 学会生成更符合人类直觉的“两个 Circle 对象叠加（小圆盖在大圆上，颜色为背景色）”，你需要如何设计数据清洗或转换规则？</p>
+<details>
+<summary>点击查看提示 (Hint)</summary>
+<p>这是一个很难的逆问题。你需要解析 Path 的拓扑结构，检测包含关系。如果发现一个 Sub-path 完全在另一个内部，且方向相反（挖空），尝试将其拆解为两个独立的形状，并将内部形状的 Fill 设为背景色。或者，依靠 MLLM 的微调阶段，用人工标注的高质量数据去纠正这种归纳偏差。</p>
+</details>
+<hr />
+<h2 id="7-gotchas">7. 常见陷阱与错误 (Gotchas)</h2>
+<h3 id="1-viewbox">1. 坐标系原点与 ViewBox 灾难</h3>
+<ul>
+<li><strong>现象</strong>：追踪出的 SVG 在浏览器里显示正常，但喂给模型训练时，模型学不会坐标分布。</li>
+<li><strong>原因</strong>：传统算法生成的 SVG 往往直接使用像素坐标（如 <code>M 500 800</code>），且可能带有巨大的 <code>transform="translate(...)"</code> 偏移。</li>
+<li><strong>调试</strong>：在作为训练数据前，必须进行 <strong>Canonicalization（规范化）</strong>。将所有路径应用 Transform 变换，将坐标重新缩放到 <code>0.0 - 1.0</code> 或 <code>0 - 256</code> 的统一 ViewBox 内，并去除无用的 Group 偏移。</li>
+</ul>
+<h3 id="2_1">2. 小数点精度爆炸</h3>
+<ul>
+<li><strong>现象</strong>：SVG 文件巨大，文本是 <code>L 10.123456789 20.987654321</code>。</li>
+<li><strong>原因</strong>：浮点数计算未截断。这就相当于让 MLLM 浪费大量 Token 去记忆无意义的显微镜级精度。</li>
+<li><strong>Rule of Thumb</strong>：对于 1024px 尺寸的图像，保留 <strong>1 位小数</strong> 甚至取整通常在视觉上已经足够。训练数据务必做 <code>round(x, 1)</code> 处理。</li>
+</ul>
+<h3 id="3-spurs">3. "毛刺"路径 (Spurs)</h3>
+<ul>
+<li><strong>现象</strong>：SVG 路径上偶尔会伸出一根极细的、肉眼几乎看不见的“刺”。</li>
+<li><strong>原因</strong>：骨架化（Skeletonization）算法在处理物体边缘不规则突起时产生的典型错误。</li>
+<li><strong>处理</strong>：需要后处理算法，修剪掉长度小于阈值的悬挂分支（Pruning）。</li>
+</ul>
+<h3 id="4">4. 颜色对齐的坑</h3>
+<ul>
+<li><strong>现象</strong>：多层彩色追踪时，色块边缘出现极细的白线（缝隙）。</li>
+<li><strong>原因</strong>：抗锯齿渲染时，两个仅仅是几何上“挨着”的形状，在像素边缘混合时会露出背景色。</li>
+<li><strong>技巧</strong>：在生成 SVG 时，稍微让底层的形状“膨胀”一点点（Trapping），或者让形状之间有轻微的重叠，而不是完美的数学拼接。这对于 MLLM 生成高质量可渲染 SVG 也是一个重要的 Trick。</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter4.html" class="nav-link prev">← [第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</a><a href="chapter6.html" class="nav-link next">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图 →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

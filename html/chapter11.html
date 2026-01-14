@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 11 章：SVG-MLLM 架构设计：理解与生成一体化</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="11-svg-mllm">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</h1>
+<h2 id="111-svg">11.1 开篇段落：重新定义 SVG 模型</h2>
+<p>在多模态大模型（MLLM）的浪潮中，我们习惯了 GPT-4V 或 Claude 3 这种“看图说话”的模式。然而，构建一个 <strong>SVG-MLLM</strong> 远比处理普通自然图像复杂。普通的 MLLM 输出的是自然语言描述，容错率极高；而 SVG-MLLM 输出的是 <strong>可执行代码</strong>。少一个闭合标签 <code>/&gt;</code>，或者坐标偏离了 5%，整个图像可能就会崩坏或完全改变语义。</p>
+<p>因此，SVG-MLLM 的架构不能仅仅是简单的 <code>ViT + LLM</code>。我们需要构建一个 <strong>“三位一体”</strong> 的架构：</p>
+<ol>
+<li><strong>视觉感知 (Perception)</strong>：看懂渲染后的像素（Raster）。</li>
+<li><strong>代码理解 (Code Reasoning)</strong>：理解 XML 树状结构与属性（Symbolic）。</li>
+<li><strong>几何对齐 (Geometric Grounding)</strong>：将像素空间与代码数值空间强绑定。</li>
+</ol>
+<p>本章将带你深入设计这个系统的每一个组件：从处理长序列坐标的特殊 Tokenizer，到融合视觉特征的 Projector，再到保证输出合法的约束解码器。</p>
+<hr />
+<h2 id="112">11.2 核心任务抽象与架构概览</h2>
+<p>在设计架构前，我们必须明确模型需要支持的 <strong>五大核心任务</strong>，这决定了输入输出流的设计：</p>
+<ol>
+<li><strong>SVG Captioning (S2T)</strong>: 输入 SVG 代码或图像 $\rightarrow$ 输出自然语言描述。</li>
+<li><strong>Text-to-SVG (T2S)</strong>: 输入自然语言 $\rightarrow$ 输出 SVG 代码。</li>
+<li><strong>SVG Rendering/Prediction</strong>: 输入部分 SVG 代码 $\rightarrow$ 预测渲染后的视觉特征（自监督学习用）。</li>
+<li><strong>SVG Editing (S2S)</strong>: 输入原 SVG + 修改指令 $\rightarrow$ 输出新 SVG。</li>
+<li><strong>Visual Grounding</strong>: 输入文本查询 $\rightarrow$ 输出对应图元的 ID 或 Bounding Box。</li>
+</ol>
+<h3 id="1121-ascii-flow">11.2.1 总体架构图 (ASCII Flow)</h3>
+<div class="codehilite"><pre><span></span><code>[Input Modalities]           [The &quot;Brain&quot; (LLM)]             [Output]
+------------------           -------------------             --------
+
+1. Image Input (PNG)
+       ⬇
+  [Visual Encoder]  ──┐
+  (e.g., SigLIP)      │
+       ⬇              │
+  [MLP Projector]     │
+       ⬇              │
+ [Visual Tokens] ─────┼───&gt; [ Transformer Decoder ] ───&gt; [Probability Distribution]
+                      │     (Llama-3 / Qwen-2 Base)                ⬇
+
+2. Text Instruction   │               ⬆                      [Next Token Prediction]
+       ⬇              │        [LoRA Adapters]                     ⬇
+ [Text Tokenizer] ────┤               │                     [Constraint Masking]
+       ⬇              │               │                            ⬇
+ [Text Tokens] ───────┘               │                  ┌───────────────────┐
+                                      │                  │ 1. Text Response  │
+
+3. SVG Code Input                     │                  │ 2. SVG Code Stream│
+       ⬇                              │                  │    &lt;path d=&quot;...&quot;  │
+ [SVG Special Tokenizer] ─────────────┘                  └───────────────────┘
+ (Coord Discretization)
+</code></pre></div>
+
+<hr />
+<h2 id="113-isvg-embedding">11.3 输入端设计 I：SVG 的序列化与 Embedding</h2>
+<p>这是 SVG-MLLM 最关键的“独门绝技”。直接用通用的 BPE（Byte Pair Encoding）处理 SVG 是灾难性的。</p>
+<h3 id="1131-tokenizer">11.3.1 为什么通用 Tokenizer 会失败？</h3>
+<p>对于路径 <code>&lt;path d="M 150.5 200.0 ..."/&gt;</code>：</p>
+<ul>
+<li><strong>LLM 视角</strong>：它被切分为 <code>['&lt;', 'path', 'd', '=', '"', 'M', '150', '.', '5', '200', ...]</code>。</li>
+<li><strong>问题</strong>：一个简单的圆可能消耗 500+ 个 Token。浮点数被切碎后，模型丢失了数值大小的概念（它不知道 <code>100</code> 比 <code>10</code> 大，它只当它们是字符）。</li>
+</ul>
+<h3 id="1132-svg-tokenizer">11.3.2 解决方案：专用 SVG Tokenizer</h3>
+<p>我们需要设计一种混合 Tokenizer：</p>
+<ol>
+<li>
+<p><strong>结构词 (Structural Tokens)</strong>：
+    保留 XML 标签，如 <code>&lt;svg&gt;</code>, <code>&lt;rect&gt;</code>, <code>fill=</code>, <code>stroke=</code>。这部分沿用 LLM 词表。</p>
+</li>
+<li>
+<p><strong>坐标离散化 (Coordinate Binning)</strong>：
+    将连续的浮点坐标映射到离散的整数区间（Bins）。</p>
+<ul>
+<li>设定画布大小为 $H \times W$（例如 $1024 \times 1024$）。</li>
+<li>将所有坐标归一化到 $[0, 1024]$ 整数。</li>
+<li><strong>新增词表</strong>：向 LLM 词表扩充 <code>&lt;coord_0&gt;</code> 到 <code>&lt;coord_1024&gt;</code> 共 1025 个特殊 Token。</li>
+<li><strong>效果</strong>：<code>M 150.5 200.0</code> 变为 <code>M</code> <code>&lt;coord_150&gt;</code> <code>&lt;coord_200&gt;</code>。序列长度缩减 60% 以上，且模型能学到 <code>&lt;coord_100&gt;</code> 和 <code>&lt;coord_101&gt;</code> 在嵌入空间上的邻近性。</li>
+</ul>
+</li>
+<li>
+<p><strong>命令压缩 (Command Compression)</strong>：
+    可以将常见的命令组合合并，例如 <code>M_x_y</code> 作为一个整体事件，或者保留 SVG 的简写逻辑（<code>h</code>, <code>v</code> 相对坐标）。</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>Rule-of-Thumb 11.1</strong>:
+<strong>坐标即位置 embedding。</strong>
+不要训练模型去“阅读”数字字符串。要让模型“选择”位置索引。通过使用 <code>&lt;coord_i&gt;</code>，你实际上是将回归问题转化为了分类问题，这在 Transformer 中更稳定。</p>
+</blockquote>
+<hr />
+<h2 id="114-ii">11.4 输入端设计 II：视觉编码器与多尺度感知</h2>
+<p>SVG 的特点是<strong>无限分辨率</strong>。线条在任何缩放级别下都是清晰的，但视觉编码器（Visual Encoder）输入通常是固定的（如 $336 \times 336$ 或 $448 \times 448$）。</p>
+<h3 id="1141">11.4.1 编码器选择</h3>
+<ul>
+<li><strong>CLIP vs. SigLIP vs. InternViT</strong>：<ul>
+<li>CLIP 收敛快但分辨率低，对细线条（Stroke）捕捉能力差。</li>
+<li><strong>推荐</strong>：<strong>SigLIP</strong> (Sigmoid Loss for Language Image Pre-training) 或 <strong>InternViT</strong>。它们在密集文本和几何形状上的表现通常优于原始 CLIP。</li>
+</ul>
+</li>
+</ul>
+<h3 id="1142-dynamic-high-res">11.4.2 动态分辨率策略 (Dynamic High-Res)</h3>
+<p>为了处理包含大量细节的工程图或地图 SVG，我们需要引入 <strong>AnyRes (Any Resolution)</strong> 机制：</p>
+<ol>
+<li><strong>全局视图</strong>：将图片 resize 到 $336 \times 336$，获取整体布局信息。</li>
+<li><strong>局部切片 (Crops)</strong>：将原图切分为 $N$ 个 $336 \times 336$ 的图块（Tiles）。</li>
+<li><strong>融合</strong>：将全局特征 + 局部图块特征拼接。</li>
+<li><strong>对于 SVG 的特殊意义</strong>：SVG 往往包含极小的文字或图符，局部切片能防止这些细节在 resize 过程中由于抗锯齿而被“抹平”。</li>
+</ol>
+<hr />
+<h2 id="115-projector">11.5 核心融合层：Projector 与模态对齐</h2>
+<p>视觉特征是 Dense 的（浮点向量），文本特征是 Discrete 的（Token ID）。连接它们的桥梁是 Projector。</p>
+<h3 id="1151-projector">11.5.1 Projector 类型</h3>
+<ul>
+<li><strong>Linear/MLP</strong>：简单高效，适合数据量极大的预训练（LLaVA 方案）。</li>
+<li><strong>Q-Former / Perceiver Resampler</strong>：使用一组可学习的 Query 来“提取”视觉特征。适合压缩超长视觉序列（例如使用了动态分辨率切片后）。</li>
+</ul>
+<h3 id="1152-grounding">11.5.2 特征对齐策略 (Grounding)</h3>
+<p>在架构层面，我们需要让模型知道 <strong>SVG 代码中的 <code>&lt;path id="5"&gt;</code></strong> 到底对应 <strong>图像中的哪一块像素</strong>。</p>
+<ul>
+<li><strong>架构增强</strong>：不只是简单的 Concat。可以引入 <strong>Segment tokens</strong>。</li>
+<li><strong>输入构造</strong>：<code>User: &lt;image_embeddings&gt; &lt;coord_bbox_10_10_50_50&gt; 这里面是什么？ Model: 这是一个 &lt;rect&gt;。</code></li>
+<li>通过这种显式的空间指令微调，迫使 Projector 学习到像素坐标与 SVG 坐标的映射关系。</li>
+</ul>
+<hr />
+<h2 id="116-constrained-decoder">11.6 输出端设计：约束解码器 (Constrained Decoder)</h2>
+<p>这是 SVG-MLLM 与普通 Chatbot 最大的区别。我们需要保证输出是“合法的 SVG”。</p>
+<h3 id="1161">11.6.1 为什么需要约束？</h3>
+<p>LLM 本质是随机采样。它可能会生成：</p>
+<ul>
+<li><code>&lt;rect x="10" r="5" /&gt;</code> （<code>rect</code> 没有 <code>r</code> 属性，只有 <code>rx/ry</code>）。</li>
+<li><code>&lt;path d="M 10 10 L 20" /&gt;</code> （路径数据中途截断，缺少坐标）。</li>
+<li><code>fill="redd"</code> （颜色拼写错误）。</li>
+</ul>
+<h3 id="1162-grammar-grammar-guided-decoding">11.6.2 基于 Grammar 的采样 (Grammar-Guided Decoding)</h3>
+<p>我们不在训练时施加硬约束，而是在 <strong>推理 (Inference)</strong> 阶段施加 Logit 掩码。</p>
+<ol>
+<li>
+<p><strong>定义 SVG 文法 (BNF/EBNF)</strong>：
+    定义合法的 XML 结构和 Path Data 序列规则。</p>
+</li>
+<li>
+<p><strong>构建有限状态机 (FSM)</strong>：</p>
+<ul>
+<li>状态 0：期待 <code>&lt;</code>。</li>
+<li>状态 1（收到 <code>&lt;</code>）：期待标签名 <code>svg</code>, <code>path</code>, <code>rect</code>...</li>
+<li>状态 2（收到 <code>rect</code>）：期待属性名 <code>x</code>, <code>y</code>, <code>width</code>...</li>
+</ul>
+</li>
+<li>
+<p><strong>Logit Processor</strong>：
+    在模型生成下一个 Token 前，检查 FSM 的当前状态。将所有导致非法状态转换的 Token 的概率设为 $-\infty$。</p>
+<ul>
+<li><em>例如</em>：如果当前正在生成 <code>x="</code> 之后，只有数字 Token <code>&lt;coord_i&gt;</code> 是允许的，字母 Token 被屏蔽。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>Rule-of-Thumb 11.2</strong>:
+<strong>让规则不仅在心中，也在手中。</strong>
+仅仅依靠大量数据训练模型学会语法是昂贵的（且不保证 100% 正确）。加上一个轻量级的 Grammar Decoder（仅增加 &lt;10ms 延迟）可以瞬间将语法正确率提升至 100%，让模型专注于语义和几何生成。</p>
+</blockquote>
+<hr />
+<h2 id="117-system-2-architecture">11.7 高级推理架构：思维链与工具回路 (System 2 Architecture)</h2>
+<p>为了处理复杂的 SVG 生成（如“画一个带渐变背景的流程图”），单次 Pass 生成往往不够。我们需要设计 <strong>Agentic Workflow</strong>。</p>
+<h3 id="1171-render-and-refine">11.7.1 渲染-修正回路 (Render-and-Refine)</h3>
+<p>这是一个多轮对话的架构模式：</p>
+<ol>
+<li><strong>Drafting</strong>: 模型生成初版 SVG 代码 $C_0$。</li>
+<li><strong>Execution</strong>: 架构中的 Python 执行器调用 <code>resvg</code> 将 $C_0$ 渲染为图像 $I_0$。</li>
+<li><strong>Perception</strong>: 视觉编码器将 $I_0$ 编码回模型。</li>
+<li><strong>Critique</strong>: 模型比较 $I_0$ 与用户指令（Prompt），生成修改建议（Feedback）。</li>
+<li><strong>Refinement</strong>: 模型根据 Feedback 生成 $C_1$。</li>
+</ol>
+<p>这实际上是在模拟人类设计师“画一笔，看一眼，改一笔”的过程。</p>
+<h3 id="1172-layout-first-generation">11.7.2 布局规划 (Layout-First Generation)</h3>
+<p>模型可以先生成布局树（Layout Tree），再填充几何细节。</p>
+<ul>
+<li>Step 1: 生成 <code>&lt;bbox class="title" x="10" y="10" w="100" h="20" /&gt;</code></li>
+<li>Step 2: 根据 bbox 生成具体的 <code>&lt;text&gt;</code> 和 <code>&lt;path&gt;</code>。
+这降低了长序列生成的难度。</li>
+</ul>
+<hr />
+<h2 id="118">11.8 本章小结</h2>
+<p>SVG-MLLM 的架构设计是一场在“灵活性”与“精确性”之间的走钢丝：</p>
+<ol>
+<li><strong>输入端</strong>：必须采用 <strong>混合 Tokenizer</strong>（文本 + 离散坐标），并配合高分辨率或多尺度的 <strong>Visual Encoder</strong> 来捕捉细微的矢量特征。</li>
+<li><strong>模型主体</strong>：利用 LLM 的预训练知识，通过 Projector 将视觉对齐到文本空间。</li>
+<li><strong>输出端</strong>：不能只依赖概率，必须引入 <strong>Grammar-Guided Decoding</strong> 确保语法/几何合法性。</li>
+<li><strong>闭环</strong>：通过渲染回路（Render Loop），让模型具备自我纠错的能力，这是通往高质量矢量生成的必经之路。</li>
+</ol>
+<p>下一章，我们将探讨如何利用这个架构进行训练：从预训练数据的构造到指令微调的技巧。</p>
+<hr />
+<h2 id="119">11.9 练习题</h2>
+<h3 id="_1">基础题</h3>
+<ol>
+<li>
+<p><strong>Tokenizer 实验</strong>：
+    给定 SVG 片段 <code>&lt;circle cx="50.5" cy="50.5" r="10"/&gt;</code>。</p>
+<ul>
+<li>(a) 写出其被标准 GPT-4 Tokenizer 切分的大致结果。</li>
+<li>(b) 假设画布为 $100\times100$，量化精度为 1。写出将其转换为 <code>&lt;cmd&gt; &lt;coord&gt;</code> 格式后的序列。</li>
+<li><strong>Hint</strong>: 注意 XML 属性名和数值的分离。</li>
+</ul>
+</li>
+<li>
+<p><strong>架构对比</strong>：
+    对比 DeepSVG（基于 VAE 和 LSTM/Transformer）与本章提出的 SVG-MLLM（基于 Decoder-only LLM）。列出至少三个维度的差异（输入模态、生成方式、通用性）。</p>
+</li>
+<li>
+<p><strong>约束逻辑</strong>：
+    如果要为一个只生成“矩形”的模型编写 Grammar Mask。请写出伪代码逻辑：当已经生成 <code>&lt;rect</code> 后，下一个允许的 Token 集合是什么？</p>
+<ul>
+<li><strong>Hint</strong>: 属性名 <code>x</code>, <code>y</code>, <code>width</code>, <code>height</code>, <code>fill</code>, <code>stroke</code> 以及闭合符 <code>/&gt;</code>。</li>
+</ul>
+</li>
+</ol>
+<h3 id="_2">挑战题</h3>
+<ol start="4">
+<li>
+<p><strong>多模态幻觉调试</strong>：
+    你训练的模型在 Text-to-SVG 任务中，经常生成代码是蓝色的，但 Caption 说是红色的。</p>
+<ul>
+<li>从架构角度分析，可能是 Vision Encoder、Projector 还是 LLM 的问题？</li>
+<li>设计一个消融实验（Ablation Study）来定位问题。</li>
+</ul>
+</li>
+<li>
+<p><strong>超长序列处理</strong>：
+    一张复杂的工程图 SVG可能有 10 万个 Token，超出了 Llama-3 的上下文窗口。</p>
+<ul>
+<li>请设计一种“分层生成”或“滑动窗口”架构来解决这个问题。</li>
+<li><strong>Hint</strong>: 参考 Google Maps 的瓦片（Tile）加载机制，或者 DOM 树的层级展开（先生成 Group 结构，再进入 Group 生成内容）。</li>
+</ul>
+</li>
+<li>
+<p><strong>开放性思考：可微渲染的集成</strong>：
+    如果我们不使用外部工具 <code>resvg</code>，而是想把渲染器做成一个可微的神经网络层（Differentiable Rendering Layer）直接插入到 Decoder 后端。这将如何改变训练的 Loss 函数？</p>
+<ul>
+<li><strong>Hint</strong>: 此时可以直接计算 Pixel Loss，而不仅仅是 Cross-Entropy Loss。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="1110-gotchas">11.10 常见陷阱与错误 (Gotchas)</h2>
+<ul>
+<li>
+<p><strong>陷阱 1：忽视 XML 的冗余性</strong></p>
+<ul>
+<li><strong>现象</strong>：模型花费大量 Token 生成无意义的 <code>xml:space="preserve"</code> 或冗长的 <code>style</code> 字符串。</li>
+<li><strong>对策</strong>：在数据预处理阶段（见第 4 章），务必进行 Canonicalization（规范化），剔除所有非必要的属性，将 style 属性展开为独立属性（如 <code>style="fill:red"</code> $\rightarrow$ <code>fill="red"</code>）。架构上，Tokenizer 甚至可以把常用属性名合并为一个 Token。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 2：Projector 的初始化崩溃</strong></p>
+<ul>
+<li><strong>现象</strong>：刚开始微调时，Loss 不降反升，或者模型开始胡言乱语。</li>
+<li><strong>对策</strong>：如果 Vision Encoder 和 LLM 都是预训练好的，<strong>必须冻结它们</strong>，只训练 Projector（Warmup 阶段）。等待特征空间对齐后，再解冻 LLM 进行全量微调。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 3：坐标归一化的坑</strong></p>
+<ul>
+<li><strong>现象</strong>：模型生成的图形长宽比（Aspect Ratio）被拉伸了。</li>
+<li><strong>原因</strong>：在 Tokenizer 中简单地将 $x, y$ 归一化到 $[0, 1024]$，忽略了原始 ViewBox 的长宽比。</li>
+<li><strong>对策</strong>：始终保持长边对齐（Fit），短边留白（Pad），或者将 <code>viewBox</code> 的长宽比作为一个特殊的 Prompt Token 输入给模型（例如 <code>&lt;ratio_1.5&gt;</code>）。</li>
+</ul>
+</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter9.html" class="nav-link prev">← 第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</a><a href="chapter12.html" class="nav-link next">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障 →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

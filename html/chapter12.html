@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="12">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</h1>
+<h2 id="1">1. 开篇段落</h2>
+<p>在 SVG-MLLM 的开发周期中，训练阶段是将数据工程（第4章）、模型架构（第11章）与渲染引擎（第7章）熔炼为智能实体的核心过程。与训练普通的文本大模型（LLM）或纯视觉模型（ViT）不同，SVG 模型面临着独特的<strong>“三位一体”挑战</strong>：它必须具备<strong>代码生成的严谨性</strong>（XML 语法不能错）、<strong>视觉生成的感知力</strong>（画出的圆必须像圆）以及<strong>自然语言的逻辑性</strong>（理解“对齐”、“分布”等抽象概念）。</p>
+<p>本章将全景式地拆解 SVG-MLLM 的训练流水线。我们将从<strong>预训练（Pre-training）</strong>开始，探讨如何让模型建立“文本-矢量-像素”的联合表征；接着进入<strong>指令微调（SFT）</strong>，详细讲解如何构造高质量的合成指令数据；随后深入<strong>偏好对齐（Alignment）</strong>，介绍如何利用渲染反馈（Reward via Rendering）来优化生成的图形质量。最后，我们将重点剖析<strong>有效性保障</strong>机制，包括训练时的数值策略和推理时的<strong>约束解码（Grammar-Guided Decoding）</strong>，这是保证模型输出 100% 可用性的关键技术。</p>
+<hr />
+<h2 id="2">2. 核心难点与训练哲学</h2>
+<p>在开始具体步骤前，我们需要确立 SVG 训练的几个核心原则（Rule of Thumb）：</p>
+<ol>
+<li><strong>SVG 是“长序列”与“高密度”的矛盾体</strong>：<ul>
+<li>一个简单的图标可能只有 200 个 token，但一张工程图可能包含 10,000 个坐标点。训练必须兼顾这两种分布。</li>
+</ul>
+</li>
+<li><strong>坐标即语义</strong>：<ul>
+<li>在文本模型中，“苹果”和“香蕉”是独立的 token；但在 SVG 中，<code>M 10 10</code> 和 <code>M 11 11</code> 在几何上极其接近。模型必须学会这种<strong>数值连续性</strong>。</li>
+</ul>
+</li>
+<li><strong>渲染闭环是必须的</strong>：<ul>
+<li>如果只用 Text Loss（交叉熵）训练，模型会倾向于记住“代码字符串”而非“图形结构”。必须在训练或评估回路中引入渲染器，建立 <code>Code -&gt; Pixel</code> 的反馈。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="3-pre-training">3. 阶段一：预训练 (Pre-training) —— 注入领域知识</h2>
+<p>预训练的目标是让模型学会 SVG 的“语言语法”和“视觉语义”。</p>
+<h3 id="31">3.1 混合模态数据配比</h3>
+<p>不要只给模型看 SVG 数据，否则它的自然语言理解能力会退化（Catastrophic Forgetting）。推荐的数据混合策略如下：</p>
+<ul>
+<li><strong>50% SVG-Text 对</strong>：来自 CommonCrawl 筛选的 <code>(SVG Code, Alt Text)</code> 或 <code>(SVG Code, Synthetic Caption)</code>。</li>
+<li><strong>30% 纯代码（Code）</strong>：HTML、XML、Python（matplotlib/cairo 代码）。这有助于模型理解结构嵌套、闭合标签和编程逻辑。</li>
+<li><strong>20% 纯文本（Text）</strong>：通用语料，保持基础的指令遵循和逻辑推理能力。</li>
+</ul>
+<h3 id="32">3.2 预训练任务设计</h3>
+<h4 id="a-causal-language-modeling-clm">任务 A：自回归生成 (Causal Language Modeling, CLM)</h4>
+<ul>
+<li><strong>形式</strong>：<code>Input: &lt;svg width="100"...</code> -&gt; <code>Target: ...&lt;/svg&gt;</code></li>
+<li><strong>目的</strong>：这是基础。让模型学会 XML 的 tag 顺序、属性规范。</li>
+<li><strong>技巧</strong>：<ul>
+<li><strong>文件内打乱（Shuffle Attributes）</strong>：SVG 属性如 <code>width</code> 和 <code>height</code> 的顺序不影响渲染。在训练时随机交换属性顺序，防止模型过拟合特定的序列模式。</li>
+</ul>
+</li>
+</ul>
+<h4 id="b-masked-span-prediction-in-filling">任务 B：掩码跨度预测 (Masked Span Prediction / In-filling)</h4>
+<ul>
+<li><strong>形式</strong>：<code>d="M10 10 [MASK] 50 50"</code></li>
+<li><strong>目的</strong>：强化<strong>几何推断</strong>能力。</li>
+<li><strong>场景</strong>：遮盖掉 path 中的中间点，强迫模型根据起点和终点插值出平滑曲线；或者遮盖掉闭合标签 <code>z</code>，强迫模型学会闭合图形。</li>
+</ul>
+<h4 id="c-visual-structural-alignment">任务 C：视觉一致性对齐 (Visual-Structural Alignment)</h4>
+<p>这是多模态模型特有的。</p>
+<ul>
+<li><strong>流程</strong>：<ol>
+<li>输入：SVG 代码片段。</li>
+<li>Encoder 输出：SVG 向量表征 $E_{svg}$。</li>
+<li>渲染：利用 <code>resvg</code> 将 SVG 渲染为图像，通过 Vision Encoder 得到 $E_{img}$。</li>
+<li><strong>Loss</strong>：最小化 $1 - \text{CosineSimilarity}(E_{svg}, E_{img})$。</li>
+</ol>
+</li>
+<li><strong>作用</strong>：拉近代码与视觉的距离，让模型明白 <code>&lt;circle&gt;</code> 代码对应“圆形”的视觉特征。</li>
+</ul>
+<hr />
+<h2 id="4-instruction-tuning">4. 阶段二：指令微调 (Instruction Tuning) —— 激发交互能力</h2>
+<p>预训练后的模型只会“续写”代码，SFT 的目标是让它听懂“指令”。由于高质量的 <code>(Instruction, SVG)</code> 数据极度稀缺，本阶段的核心在于<strong>数据合成（Data Synthesis）</strong>。</p>
+<h3 id="41">4.1 核心指令数据构造流水线</h3>
+<h4 id="1-captioning-to-code">1. 逆向描述生成 (Captioning-to-Code)</h4>
+<p>利用 GPT-4V 或 Gemini Pro Vision 等强力多模态模型。</p>
+<ul>
+<li><strong>输入</strong>：一张 SVG 渲染图。</li>
+<li><strong>Prompt</strong>：<em>“请详细描述这张图的几何构成、颜色布局，并推测生成它的意图。如果是图标，描述其含义。”</em></li>
+<li><strong>数据对</strong>：<code>(Model Generated Caption) -&gt; (Original SVG Code)</code>。</li>
+<li><strong>注意</strong>：要控制描述的粒度，生成三种不同层级的描述：<ul>
+<li><strong>High-level</strong>: "一个红色的搜索图标。"</li>
+<li><strong>Mid-level</strong>: "一个红色的圆环，右下角有一个向外延伸的长方形手柄。"</li>
+<li><strong>Low-level</strong>: "画一个圆心在(50,50)半径20的圆..."（类似代码注释）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-programmatic-editing">2. 程序化编辑与指令合成 (Programmatic Editing)</h4>
+<p>利用 Python 的 <code>xml.etree</code> 或 <code>lxml</code> 库对 SVG 进行随机扰动，生成完美的编辑指令数据。</p>
+<ul>
+<li><strong>原图</strong>：一个蓝色的矩形 <code>&lt;rect fill="blue" ... /&gt;</code>。</li>
+<li><strong>操作</strong>：脚本将 <code>fill</code> 属性改为 <code>red</code>。</li>
+<li><strong>合成指令</strong>：模板填充 -&gt; "把蓝色的矩形改成红色" / "Change the color to red"。</li>
+<li><strong>数据对</strong>：<code>User: [Original SVG] + "把颜色变红" -&gt; Assistant: [Modified SVG]</code>。</li>
+<li><strong>扩展</strong>：可以程序化生成“旋转”、“缩放”、“位移”、“加粗边框”等成千上万条精准数据。</li>
+</ul>
+<h4 id="3-cot">3. 思维链 (CoT) 数据增强</h4>
+<p>为了解决复杂图形生成难的问题，我们需要让模型学会“分步画”。</p>
+<ul>
+<li><strong>构造方法</strong>：解析 SVG DOM 树，将其转化为自然语言步骤。</li>
+<li><strong>数据样例</strong>：<ul>
+<li><em>User</em>: "画一个房子。"</li>
+<li><em>Assistant</em>:<ul>
+<li><code>&lt;thought&gt;</code> 首先，我需要画一个三角形作为屋顶。然后，在屋顶下方画一个正方形作为主体。最后，在主体中间画一个小矩形作为门。 <code>&lt;/thought&gt;</code></li>
+<li><code>&lt;code&gt;</code> <svg> ... </svg> <code>&lt;/code&gt;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="42-prompt-engineering">4.2 训练输入格式 (Prompt Engineering)</h3>
+<p>为了兼容纯文本 LLM 的架构，通常将 SVG 包装在特殊 token 中：</p>
+<div class="codehilite"><pre><span></span><code>User: Generate a warning icon.
+Assistant: &lt;|svg_start|&gt;
+&lt;svg viewBox=&quot;0 0 24 24&quot;&gt;
+  &lt;path d=&quot;...&quot; /&gt;
+&lt;/svg&gt;
+&lt;|svg_end|&gt;
+</code></pre></div>
+
+<hr />
+<h2 id="5">5. 有效性保障：数值策略与约束解码</h2>
+<p>SVG 训练中最大的坑在于<strong>生成了无效代码</strong>。</p>
+<h3 id="51-tokenization">5.1 数值表示与 Tokenization</h3>
+<p>SVG 坐标（如 <code>d="M 12.5 34.2"</code>）对通用 Tokenizer 是噩梦。</p>
+<ul>
+<li><strong>问题</strong>：LLaMA 的 tokenizer 可能把 <code>12.5</code> 切分为 <code>1</code>, <code>2</code>, <code>.</code>, <code>5</code>，或者 <code>12</code>, <code>.5</code>。这破坏了数值的连续性。</li>
+<li><strong>策略 A：坐标离散化（Coordinate Binning）</strong><ul>
+<li>将所有坐标归一化到 <code>0-1000</code> 的整数。</li>
+<li>扩展词表，加入 <code>&lt;0&gt;</code> 到 <code>&lt;1000&gt;</code> 的特殊 token。</li>
+<li>SVG 代码变为：<code>M &lt;12&gt; &lt;34&gt;</code>。</li>
+<li><strong>优点</strong>：大大缩短序列长度，模型更容易学习空间关系。</li>
+</ul>
+</li>
+<li><strong>策略 B：纯文本数字优化</strong><ul>
+<li>如果必须保留浮点数，强制将所有数字格式化为固定精度（如保留1位小数），避免模型在 <code>10.000001</code> 和 <code>10</code> 之间纠结。</li>
+</ul>
+</li>
+</ul>
+<h3 id="52-grammar-guided-decoding-ggd">5.2 约束解码 (Grammar-Guided Decoding / GGD)</h3>
+<p><strong>这是本章最重要的工程技巧（Rule of Thumb）。</strong> 不要在训练中过度追求 100% 语法正确，而应在推理阶段强制约束。</p>
+<ul>
+<li><strong>原理</strong>：在 LLM 生成每一个 token 时，检查该 token 是否符合 SVG/XML 的语法树（CFG）。如果不符合，将其概率设为 0。</li>
+<li><strong>实现层级</strong>：<ol>
+<li><strong>XML 结构层</strong>：当处于 <code>&lt;</code> 后，候选词只能是 <code>svg, path, rect, g, defs</code> 等标签名。</li>
+<li><strong>属性层</strong>：当处于 <code>&lt;rect</code> 后，候选词只能是 <code>x, y, width, height, fill</code> 等属性名。</li>
+<li><strong>Path 数据层 (最关键)</strong>：当处于 <code>d="</code> 后，进入<strong>几何状态机</strong>。<ul>
+<li>如果刚生成了 <code>M</code> (Move to)，接下来必须是两个数字（x, y）。</li>
+<li>禁止在数字中间生成字母。</li>
+<li>禁止在引号未闭合前生成 <code>&gt;</code>。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><strong>收益</strong>：使用 GGD 可以将生成代码的语法解析成功率从 85% 提升到 <strong>99.9%</strong>，且不额外消耗训练资源。</li>
+</ul>
+<hr />
+<h2 id="6-alignment">6. 阶段三：偏好对齐 (Alignment) —— 追求“更可用”</h2>
+<p>SFT 后的模型能画图，但往往代码冗余（画了100个小线段代替一条曲线）或不美观。我们需要 RLHF 或 DPO。</p>
+<h3 id="61-reward-model">6.1 奖励模型 (Reward Model) 的多维信号</h3>
+<p>我们需要计算一个标量 $R$ 来衡量 SVG 的好坏：</p>
+<p>$$R = w_1 R_{parse} + w_2 R_{render} + w_3 R_{simplicity} + w_4 R_{aesthetic}$$</p>
+<ol>
+<li><strong>$R_{parse}$ (语法分)</strong>：能被 XML parser 解析 +1，否则 -10。</li>
+<li><strong>$R_{render}$ (渲染一致性)</strong>：渲染图 $I_{gen}$ 与 Ground Truth $I_{gt}$ 的相似度（CLIP Score 或 LPIPS）。</li>
+<li><strong>$R_{simplicity}$ (奥卡姆剃刀)</strong>：<ul>
+<li><strong>文件大小</strong>：越小越好。</li>
+<li><strong>指令数</strong>：用贝塞尔曲线（C）代替折线（L）得分更高。</li>
+<li><strong>原语使用</strong>：用 <code>&lt;circle&gt;</code> 代替 <code>&lt;path&gt;</code> 画圆得分更高（语义更清晰）。</li>
+</ul>
+</li>
+<li><strong>$R_{aesthetic}$ (美学分)</strong>：基于美学评分模型（Aesthetic Scorer）对渲染图打分。</li>
+</ol>
+<h3 id="62-dpo-direct-preference-optimization">6.2 DPO (Direct Preference Optimization) 实践</h3>
+<p>相比 RLHF，DPO 更稳定。</p>
+<ul>
+<li><strong>数据构造</strong>：<ul>
+<li><em>Prompt</em>: "画一个圆角矩形。"</li>
+<li><em>Chosen (赢家)</em>: <code>&lt;rect x="10" y="10" rx="5" ... /&gt;</code> (使用了 rx 属性，代码短)</li>
+<li><em>Rejected (输家)</em>: <code>&lt;path d="M 15 10 L ... Q ... " /&gt;</code> (用 path 模拟圆角，代码长且难编辑)</li>
+</ul>
+</li>
+<li><strong>训练</strong>：让模型增加生成 <em>Chosen</em> 的概率，降低生成 <em>Rejected</em> 的概率。这能有效引导模型写出“人类开发者喜欢”的干净 SVG 代码。</li>
+</ul>
+<hr />
+<h2 id="7-curriculum-learning">7. 课程学习 (Curriculum Learning)</h2>
+<p>为了稳定训练，建议按难度分级推进：</p>
+<p>| 阶段 | 数据类型 | 学习目标 | 训练重点 |</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">阶段</th>
+<th style="text-align: left;">数据类型</th>
+<th style="text-align: left;">学习目标</th>
+<th style="text-align: left;">训练重点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Stage 1</strong></td>
+<td style="text-align: left;">基本图元 (Primitives)</td>
+<td style="text-align: left;">坐标空间、基本属性</td>
+<td style="text-align: left;">只有 rect, circle, line。强约束坐标范围。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Stage 2</strong></td>
+<td style="text-align: left;">图标与符号 (Icons)</td>
+<td style="text-align: left;">Path 语言、组合 (Group)</td>
+<td style="text-align: left;">引入 <code>&lt;path d="..."&gt;</code> 和简单的 <code>&lt;g&gt;</code> 嵌套。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Stage 3</strong></td>
+<td style="text-align: left;">复杂插画 (Illustration)</td>
+<td style="text-align: left;">层次结构、色彩、复用</td>
+<td style="text-align: left;">引入 <code>&lt;defs&gt;</code>, <code>&lt;use&gt;</code>, gradient, mask。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Stage 4</strong></td>
+<td style="text-align: left;">动态交互 (Animation)</td>
+<td style="text-align: left;">时间维度、事件</td>
+<td style="text-align: left;">引入 <code>&lt;animate&gt;</code>, <code>&lt;set&gt;</code>。</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8">8. 本章小结</h2>
+<p>SVG-MLLM 的训练不是简单的“文本生成训练”，而是一个<strong>代码生成</strong>与<strong>视觉渲染</strong>深度耦合的系统工程。</p>
+<ol>
+<li><strong>预训练</strong>决定了模型的上限（多模态理解力）。</li>
+<li><strong>指令微调</strong>决定了模型的可用性（听懂人话）。</li>
+<li><strong>约束解码</strong>是落地的安全带（保证不报错）。</li>
+<li><strong>偏好对齐</strong>是通往“专家级”生成的阶梯（代码优雅、结构精简）。</li>
+</ol>
+<hr />
+<h2 id="9">9. 练习题</h2>
+<p><strong>基础题</strong></p>
+<ol>
+<li><strong>数据配比</strong>：在预训练中，为什么要保留 30% 的非 SVG 代码（如 Python/HTML）？如果去掉这部分会有什么具体影响？</li>
+<li><strong>约束解码</strong>：请设计一个简单的状态机（FSM）逻辑，用于约束 <code>&lt;rect&gt;</code> 标签内部的生成过程。需要包含哪些状态？</li>
+<li><strong>Loss 设计</strong>：在计算视觉对齐 Loss 时，为什么我们通常使用渲染后的图像 Embedding 计算余弦相似度，而不是直接计算像素级的 MSE（均方误差）？（提示：考虑 SVG 的拓扑不变性）。</li>
+</ol>
+<p><strong>挑战题</strong></p>
+<ol start="4">
+<li><strong>场景设计</strong>：假设你要训练一个专门用于“UI 界面生成”的 SVG 模型。除了通用的 SVG 数据，你还需要构造什么样的<strong>特定指令数据</strong>？请给出 3 个具体的 Prompt 模板。</li>
+<li><strong>DPO 构造</strong>：编写一个 Python 函数思路，自动判断两个渲染效果相同的 SVG 中，哪一个更优（作为 Chosen）。你需要考虑哪些具体的指标？（Hint: path 节点数、DOM 深度、属性冗余度）。</li>
+<li><strong>思考题</strong>：SVG 中的 <code>transform="matrix(...)"</code> 属性对于人类和模型都很难直观理解。在训练前的数据预处理阶段，应该保留它，还是将其“烘焙”（Bake）应用到具体的坐标点中？分析两者的利弊。</li>
+</ol>
+<hr />
+<h2 id="10-gotchas">10. 常见陷阱与错误 (Gotchas)</h2>
+<ol>
+<li>
+<p><strong>"NaN" 梯度爆炸</strong>：</p>
+<ul>
+<li><em>现象</em>：训练中 Loss 突然变成 NaN。</li>
+<li><em>原因</em>：SVG 中存在极小或极大的坐标值（如 <code>1e-9</code> 或 <code>1e9</code>），导致回归 Loss 或 Embedding 计算溢出。</li>
+<li><em>对策</em>：在预处理阶段严格执行坐标 Clamping（截断）和 Normalization（归一化）。</li>
+</ul>
+</li>
+<li>
+<p><strong>ViewBox 陷阱</strong>：</p>
+<ul>
+<li><em>现象</em>：模型生成的图在画布外，或者只有左上角一点点。</li>
+<li><em>原因</em>：训练数据中混杂了 <code>viewBox="0 0 1024 1024"</code> 和 <code>viewBox="0 0 24 24"</code> 的数据，模型搞混了尺度。</li>
+<li><em>对策</em>：<strong>强制重缩放（Rescaling）</strong>。在 Data Loader 中，利用正则将所有 SVG 的 path 数据重映射到统一的 <code>0-1024</code> 空间，并覆写 viewBox 属性。</li>
+</ul>
+</li>
+<li>
+<p><strong>颜色过拟合</strong>：</p>
+<ul>
+<li><em>现象</em>：模型不管什么指令都喜欢画黑色的图。</li>
+<li><em>原因</em>：互联网上的 icon 大多是黑色的（默认 fill="black"）。</li>
+<li><em>对策</em>：<strong>色彩增强（Color Augmentation）</strong>。在训练时，随机将 SVG 源码中的颜色属性替换为其他随机颜色，并同步修改对应的 Caption（如果 Caption 包含颜色词）。</li>
+</ul>
+</li>
+<li>
+<p><strong>忽略自交（Self-Intersection）</strong>：</p>
+<ul>
+<li><em>现象</em>：生成的图形边缘打结，甚至导致渲染引擎崩溃。</li>
+<li><em>对策</em>：在 DPO 阶段，使用 <code>shapely</code> 等几何库检测 path 是否自交，对严重自交的样本给予极其严厉的负反馈（Negative Reward）。</li>
+</ul>
+</li>
+</ol>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter11.html" class="nav-link prev">← 第 11 章：SVG-MLLM 架构设计：理解与生成一体化</a><a href="CLAUDE.html" class="nav-link next">Untitled →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="3-svg-web-domcssjs-threejs">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</h1>
+<h2 id="1">1. 开篇段落</h2>
+<p>在计算机视觉领域，图片通常被视为像素矩阵；但在 Web 领域，SVG 是活生生的<strong>文档（Document）</strong>和<strong>代码（Code）</strong>。对于致力于“理解-生成一体”的 MLLM 而言，理解 SVG 的 Web 运行环境至关重要。</p>
+<p>如果模型只是简单地预测下一个 token，它可能会生成语法正确的 XML，但渲染出来却是一片空白（因为丢失了 CSS 上下文），或者是结构混乱的“面条代码”（因为不懂 DOM 树的逻辑分组）。此外，SVG 在现代 Web 图形学中扮演着“资产交换格式”的角色，它是通往 3D 世界（three.js）的桥梁。</p>
+<p>本章的学习目标是：</p>
+<ol>
+<li><strong>解构浏览器渲染管线</strong>：理解从代码到像素的每一步，定位渲染错误的根源。</li>
+<li><strong>掌握 DOM 与 CSS 的纠缠</strong>：学会处理样式继承和层叠，为训练数据清洗提供理论依据。</li>
+<li><strong>连接 2D 与 3D</strong>：利用 three.js 将 SVG 转化为 3D 模型，扩展模型的能力边界。</li>
+<li><strong>建立“源码-像素”映射</strong>：利用浏览器机制构建细粒度的 Visual Grounding（视觉定位）数据集。</li>
+</ol>
+<hr />
+<h2 id="2">2. 文字论述</h2>
+<h3 id="31">3.1 浏览器渲染管线：代码是如何变成图像的</h3>
+<p>当我们将一段 SVG 字符串喂给浏览器（或 headless 渲染器如 Puppeteer/resvg）时，它经历的流程比普通图片要复杂得多。</p>
+<p><strong>渲染管线图解 (ASCII)：</strong></p>
+<div class="codehilite"><pre><span></span><code>[ SVG 源码字符串 ]
+      ⬇ 1. 解析 (Parsing)
+[ DOM 树 (节点结构) ] &lt;--- [ 外部 CSS / &lt;style&gt; / User Agent 样式 ]
+      ⬇ 2. 样式计算 (Style Recalculation)
+[ 渲染树 (Render Tree) ] -&gt; (每个节点获得 computed styles，如 fill: rgb(255,0,0))
+      ⬇ 3. 布局 / 重排 (Layout / Reflow)
+[ 几何计算 ] -&gt; (解析 viewBox, transform, 计算包围盒 BBox)
+      ⬇ 4. 绘制 (Paint)
+[ 绘制指令 ] -&gt; (光栅化路径, 填充颜色, 描边)
+      ⬇ 5. 合成 (Composite)
+[ 图层合并 ] -&gt; (处理 opacity, mask, filter, 最终输出像素)
+</code></pre></div>
+
+<p><strong>Rule of Thumb（经验法则）：</strong></p>
+<ul>
+<li><strong>训练数据的“存活率”</strong>：在构建数据集时，<strong>解析（Parsing）</strong>是第一道过滤器。如果 XML 解析器报错，直接丢弃。但更隐蔽的是<strong>布局（Layout）</strong>阶段的错误——例如 <code>width="0"</code> 或 <code>viewBox</code> 定义非法，导致渲染结果为空。你需要一个渲染后端来验证生成的有效性。</li>
+<li><strong>Token 的物理意义</strong>：模型生成的每一个坐标数字，都在 Layout 阶段被映射。理解 <code>viewBox</code> 是理解坐标生成的关键（详见第 2 章）。</li>
+</ul>
+<h3 id="32-svg-dom">3.2 SVG DOM：树形结构与逻辑分组</h3>
+<p>SVG 不仅仅是图形列表，它是 DOM（文档对象模型）树。这种<strong>层级性</strong>是 SVG 区别于 Canvas 的核心。</p>
+<p><strong>DOM 结构示意 (ASCII)：</strong></p>
+<div class="codehilite"><pre><span></span><code>&lt;svg&gt; (根节点, 定义画布)
+ ├── &lt;defs&gt; (定义区, 不渲染)
+ │    └── &lt;linearGradient id=&quot;grad1&quot;&gt; ... &lt;/linearGradient&gt;
+ ├── &lt;g id=&quot;car-body&quot; transform=&quot;translate(10,0)&quot;&gt; (逻辑分组: 车身)
+ │    ├── &lt;rect class=&quot;chassis&quot; ... /&gt; (继承父级变换)
+ │    └── &lt;path d=&quot;...&quot; fill=&quot;url(#grad1)&quot;/&gt; (引用定义)
+ └── &lt;g id=&quot;wheels&quot;&gt; (逻辑分组: 车轮)
+      ├── &lt;circle ... /&gt;
+      └── &lt;circle ... /&gt;
+</code></pre></div>
+
+<p><strong>对 MLLM 的关键启示：</strong></p>
+<ol>
+<li><strong>编辑即“操作树”</strong>：如果用户指令是“把车身变大一点”，模型不应该去修改 <code>&lt;rect&gt;</code> 和 <code>&lt;path&gt;</code> 的具体坐标，而应该识别出 <code>id="car-body"</code> 的 <code>&lt;g&gt;</code> 节点，并修改其 <code>transform="scale(...)"</code> 属性。</li>
+<li><strong>上下文依赖</strong>：子节点的最终渲染效果取决于父节点链。例如，父节点 <code>opacity="0.5"</code>，子节点也是 <code>0.5</code>，那么子节点实际视觉透明度是 $0.5 \times 0.5 = 0.25$。模型必须学会这种<strong>属性传播（Propagation）</strong>机制。</li>
+</ol>
+<h3 id="33-css-in-svg">3.3 CSS in SVG：样式分离的隐患与对策</h3>
+<p>在 HTML5 环境下，SVG 的样式系统极其复杂。这是导致 MLLM 训练数据质量差的头号杀手。</p>
+<p><strong>样式的三种来源与优先级（由低到高）：</strong></p>
+<ol>
+<li><strong>属性（Attributes）</strong>：<code>&lt;rect fill="red"&gt;</code>（优先级最低，常被覆盖）</li>
+<li><strong>CSS 类/ID</strong>：<code>&lt;style&gt;.bg { fill: blue; }&lt;/style&gt; ... &lt;rect class="bg"&gt;</code></li>
+<li><strong>内联样式（Inline Style）</strong>：<code>&lt;rect style="fill: green"&gt;</code>（优先级最高）</li>
+</ol>
+<p><strong>数据工程陷阱：</strong>
+很多从网页爬取的 SVG，其颜色由网页的全局 CSS 控制（例如 <code>Dark Mode</code> 下变白）。如果你只把 <code>&lt;svg&gt;...&lt;/svg&gt;</code> 这一段代码存下来，不管是通过浏览器还是 <code>resvg</code> 渲染，得到的往往是<strong>黑色（默认色）</strong>的图标。</p>
+<p><strong>Rule of Thumb（经验法则）：</strong></p>
+<ul>
+<li><strong>Computed Style Inlining（计算样式内联化）</strong>：在清洗数据时，必须启动一个 Headless Browser，加载 SVG，使用 JS 获取每个元素的 <code>window.getComputedStyle()</code>，然后将计算后的最终值（如 <code>fill: #ff0000</code>）强制写入元素的 <code>style</code> 属性或 presentation attributes 中。<strong>只有这样，你的代码和你的渲染图才是“对齐”的。</strong></li>
+</ul>
+<h3 id="34-js">3.4 JS 交互：从静态图到动态程序</h3>
+<p>SVG 的 <code>&lt;script&gt;</code> 标签和事件处理器（如 <code>onclick</code>）赋予了它图灵完备的能力。</p>
+<ul>
+<li><strong>Hit-Testing（拾取）</strong>：浏览器内置了复杂的数学算法，判断鼠标点击点是否在贝塞尔曲线包围的区域内。</li>
+<li><strong>动画与状态机</strong>：通过 JS 修改 DOM 属性（如 <code>d</code> 路径数据），可以实现变形动画。</li>
+</ul>
+<p><strong>模型视角：</strong>
+如果你的目标是生成 Web UI 组件，模型需要学习生成带有 <code>class</code> 和 <code>id</code> 钩子的 SVG，以便前端工程师挂载 JS 逻辑。</p>
+<h3 id="35-use-shadow-dom">3.5 外部资源引用：<code>&lt;use&gt;</code> 与 Shadow DOM</h3>
+<p><code>&lt;use&gt;</code> 标签是 SVG 的“函数调用”。</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;defs&gt;</span>
+<span class="w">  </span><span class="nt">&lt;path</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;leaf&quot;</span><span class="w"> </span><span class="na">d=</span><span class="s">&quot;...&quot;</span><span class="w"> </span><span class="nt">/&gt;</span><span class="w"> </span><span class="cm">&lt;!-- 函数定义 --&gt;</span>
+<span class="nt">&lt;/defs&gt;</span>
+<span class="nt">&lt;use</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;#leaf&quot;</span><span class="w"> </span><span class="na">x=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">y=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="nt">/&gt;</span><span class="w"> </span><span class="cm">&lt;!-- 函数调用 1 --&gt;</span>
+<span class="nt">&lt;use</span><span class="w"> </span><span class="na">href=</span><span class="s">&quot;#leaf&quot;</span><span class="w"> </span><span class="na">x=</span><span class="s">&quot;50&quot;</span><span class="w"> </span><span class="na">y=</span><span class="s">&quot;10&quot;</span><span class="w"> </span><span class="na">transform=</span><span class="s">&quot;rotate(45)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span><span class="w"> </span><span class="cm">&lt;!-- 函数调用 2 --&gt;</span>
+</code></pre></div>
+
+<p><strong>对 Tokenizer 的影响：</strong></p>
+<ul>
+<li><strong>压缩率极高</strong>：重复的几何结构只需定义一次。</li>
+<li><strong>理解难度大</strong>：模型在处理 <code>&lt;use&gt;</code> 时，必须具有<strong>长距离注意力（Long-context Attention）</strong>，回头去 <code>&lt;defs&gt;</code> 里寻找 <code>#leaf</code> 的形状定义，才能在脑海中“渲染”出树叶的样子。</li>
+<li><strong>Shadow DOM</strong>：<code>&lt;use&gt;</code> 创建了一个封闭的影子树，样式继承规则更为晦涩。</li>
+</ul>
+<h3 id="36-37-svg-threejs-2d-3d">3.6 &amp; 3.7 SVG 与 three.js：从 2D 到 3D 的飞跃</h3>
+<p>three.js 是 Web 端事实上的 3D 标准库。SVG 在其中扮演了 <strong>2D 蓝图</strong> 的角色。</p>
+<p><strong>转化流程 (ASCII)：</strong></p>
+<div class="codehilite"><pre><span></span><code>[ SVG Path ] -&gt; &quot;M 10 10 L 90 10 L 90 90 Z&quot; (平面指令)
+      ⬇ SVGLoader.load()
+[ ShapePath ] -&gt; (three.js 内部的 2D 形状对象)
+      ⬇ ExtrudeGeometry(shape, { depth: 20 }) (挤出操作)
+[ 3D Mesh ] -&gt; (拥有了厚度/Z轴深度的 3D 物体)
+      ⬇ WebGL Renderer
+[ 3D 渲染图 ]
+</code></pre></div>
+
+<p><strong>应用场景：</strong>
+训练 MLLM 生成 SVG，实际上等于训练它生成简单的 3D 模型。用户输入“生成一个五角星徽章”，模型输出 SVG 五角星，通过 three.js 挤出并贴上金属材质，即可得到 3D 资产。这比直接生成 3D 点云或 Mesh 要稳定得多。</p>
+<h3 id="38-pixel-to-code-grounding">3.8 核心价值：文字-图像联动 (Pixel-to-Code Grounding)</h3>
+<p>这是本章对于 SVG-MLLM 最核心的贡献：<strong>如何利用 Web 技术构建完美的对齐数据。</strong></p>
+<p>在栅格图像（JPG/PNG）中，我们很难知道“左上角那棵树”对应哪一部分像素。但在浏览器中，通过 DOM API，我们拥有上帝视角。</p>
+<p><strong>构建“黄金数据集”的步骤：</strong></p>
+<ol>
+<li><strong>渲染</strong>：在 Headless Browser 中加载 SVG。</li>
+<li><strong>遍历</strong>：遍历 DOM 树中所有可视的 <code>&lt;path&gt;</code> / <code>&lt;rect&gt;</code> 等元素。</li>
+<li><strong>定位</strong>：对每个元素调用 <code>getBoundingClientRect()</code>，获得屏幕坐标 <code>(x, y, width, height)</code>。</li>
+<li><strong>描述（可选）</strong>：将该元素的 SVG 代码片段喂给纯文本 LLM，让其生成简短描述（如“红色的圆形轮子”）。</li>
+<li><strong>构造样本</strong>：<ul>
+<li><strong>Image</strong>: SVG 渲染图</li>
+<li><strong>BBox</strong>: <code>[10, 10, 50, 50]</code></li>
+<li><strong>Code</strong>: <code>&lt;circle cx="30" cy="30" r="20" fill="red"/&gt;</code></li>
+<li><strong>Text</strong>: "A red circular wheel"</li>
+</ul>
+</li>
+</ol>
+<p>这种<strong>四元组数据</strong>是训练具备“指哪打哪”（Referring Expression Generation/Segmentation）能力的 MLLM 的基石。</p>
+<h3 id="39">3.9 性能与兼容性</h3>
+<ul>
+<li><strong>Filter 陷阱</strong>：<code>&lt;filter&gt;</code>（高斯模糊、阴影）非常消耗渲染资源。如果模型生成的 SVG 包含大量滤镜，会导致渲染引擎（训练时的 reward model）变慢 10 倍以上。</li>
+<li><strong>精度问题</strong>：浏览器对坐标通常保留 3-4 位小数。模型如果生成 10 位小数，属于无效精度，浪费 Token。</li>
+</ul>
+<hr />
+<h2 id="3">3. 本章小结</h2>
+<p>本章揭示了 SVG 在 Web 生态中的真实面貌。</p>
+<ul>
+<li>SVG 不是静止的图片，而是<strong>可编程的 DOM 树</strong>，受 CSS 样式流和 JS 事件流的控制。</li>
+<li>对于 MLLM 数据工程，<strong>“样式内联化”</strong>是确保代码与视觉一致性的关键步骤。</li>
+<li><code>&lt;use&gt;</code> 和 <code>&lt;defs&gt;</code> 提供了复用机制，但也增加了模型理解上下文的难度。</li>
+<li>通过 <code>three.js</code>，SVG 的生成能力可以低成本地扩展到 3D 领域。</li>
+<li>最重要的是，Web 浏览器的 <code>getBoundingClientRect</code> API 为我们提供了一种自动化的方法，来构建<strong>像素级精确的“代码-图像”对齐数据</strong>，这是训练理解生成一体化模型的神兵利器。</li>
+</ul>
+<hr />
+<h2 id="4">4. 练习题</h2>
+<h3 id="_1">基础题（熟悉材料）</h3>
+<ol>
+<li><strong>渲染管线排序</strong>：请将以下步骤按浏览器执行顺序排列：Paint, Parsing, Layout, Composite, Style Calculation。<ul>
+<li><em>Hint: 先有结构，再有样式，再有位置，再有像素。</em></li>
+</ul>
+</li>
+<li><strong>CSS 继承</strong>：如果在 <code>&lt;g fill="red" stroke="blue"&gt;</code> 内部有一个 <code>&lt;path fill="green" /&gt;</code>，请问这个 path 的最终填充色（fill）和描边色（stroke）分别是什么？<ul>
+<li><em>Hint: 显式属性 &gt; 继承属性。</em></li>
+</ul>
+</li>
+<li><strong>ViewBox 计算</strong>：一个 SVG 的 <code>width="100" height="100" viewBox="0 0 50 50"</code>。如果在代码中绘制一个 <code>width="50"</code> 的矩形，它在屏幕上实际显示多宽（像素）？<ul>
+<li><em>Hint: 视口(Viewport) vs 视窗(ViewBox) 的缩放比例。</em></li>
+</ul>
+</li>
+<li><strong>three.js 逻辑</strong>：在 three.js 中，要将一个 2D SVG 变成一个有厚度的 3D 硬币，应该使用哪种 Geometry？<ul>
+<li><em>Hint: Extrude。</em></li>
+</ul>
+</li>
+</ol>
+<h3 id="_2">挑战题（开放性思考）</h3>
+<ol start="5">
+<li><strong>数据清洗流水线设计</strong>：设计一个 Python + Selenium/Puppeteer 的脚本逻辑，用于批量处理爬取的 SVG。要求：(1) 移除所有 <code>&lt;script&gt;</code> 以防安全风险；(2) 将外部 CSS 样式固化到元素属性上；(3) 剔除渲染后为空白的 SVG。<ul>
+<li><em>Hint: 重点在于如何检测“渲染后为空白”（检查 BBox 或截图分析像素熵）。</em></li>
+</ul>
+</li>
+<li><strong>上下文敏感的生成</strong>：假设我们要训练模型通过“补全”的方式编辑 SVG。如果给定的 context 是一个被切断的 <code>&lt;use href="#icon-1"/&gt;</code>，但 <code>#icon-1</code> 定义在被截断的 context 之外。你应该如何在预处理阶段解决这个问题？<ul>
+<li><em>Hint: Flattening (扁平化) —— 用实际的 path 数据替换 use 引用。</em></li>
+</ul>
+</li>
+<li><strong>反向工程</strong>：如果我们有一个 SVG 渲染引擎（不可微），如何利用它来实现“给定一张图，生成 SVG”的 Reinforcement Learning (RL) 闭环？<ul>
+<li><em>Hint: 思考 Reward Function 怎么写（像素差异 loss），以及如何利用 DOM 结构进行局部搜索。</em></li>
+</ul>
+</li>
+<li><strong>SVG 动画理解</strong>：<code>&lt;animate&gt;</code> 标签会改变 DOM 属性。如果我们要训练一个模型理解动画，单纯的截图（Screenshot）还够用吗？需要什么样的数据表示？<ul>
+<li><em>Hint: 视频流 vs 关键帧序列 vs 代码中的时间参数。</em></li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="5-gotchas">5. 常见陷阱与错误 (Gotchas)</h2>
+<ul>
+<li>
+<p><strong>陷阱 1：Z-index 的缺失</strong></p>
+<ul>
+<li><strong>现象</strong>：模型习惯了 CSS 的 <code>z-index</code>，试图在 SVG 中生成 <code>z-index="999"</code> 来让物体置顶。</li>
+<li><strong>真相</strong>：SVG 遵循“画家算法”（Painter's Algorithm），<strong>后写的元素盖在先写的元素上面</strong>。要改变层级，必须改变 DOM 节点的顺序。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 2：HTML 颜色名的幻觉</strong></p>
+<ul>
+<li><strong>现象</strong>：模型生成 <code>fill="chocolate"</code> 或 <code>fill="rebeccapurple"</code>。</li>
+<li><strong>风险</strong>：虽然现代浏览器支持大多数颜色名，但一些老旧的 SVG 解析器（或深度学习库中的简单解析器）可能只支持 <code>red</code>, <code>blue</code> 等基本色或 Hex 代码。</li>
+<li><strong>建议</strong>：在数据预处理时，统一将所有颜色转换为 Hex (<code>#RRGGBB</code>) 或 <code>rgba()</code> 格式。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 3：变换中心点 (Transform Origin) 的差异</strong></p>
+<ul>
+<li><strong>现象</strong>：在 CSS 中，<code>rotate(45deg)</code> 默认围绕元素中心旋转；但在 SVG 的 <code>transform</code> 属性中，<code>rotate(45)</code> 默认围绕 <strong>(0, 0)</strong> 原点旋转。</li>
+<li><strong>后果</strong>：模型生成的旋转物体飞到了画布外面。</li>
+<li><strong>解决</strong>：必须显式指定旋转中心 <code>rotate(45, cx, cy)</code>。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 4：<code>&lt;image&gt;</code> 标签的跨域问题 (CORS)</strong></p>
+<ul>
+<li><strong>现象</strong>：SVG 内部可以嵌入 Base64 图片或外链图片。如果模型生成了外链图片（如 <code>href="http://example.com/a.jpg"</code>），在渲染生成结果时，可能会因为 CORS 策略被浏览器拦截，导致画布部分空白。</li>
+<li><strong>建议</strong>：训练目标应尽量限制为纯矢量生成，或者强制要求模型输出 Base64 编码的内嵌图片。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 5：单位的混乱</strong></p>
+<ul>
+<li><strong>现象</strong>：<code>width="100"</code> (默认为 px) vs <code>width="100%"</code> vs <code>width="100mm"</code>。</li>
+<li><strong>对策</strong>：归一化！在预处理阶段，将所有单位统一转换为无单位的用户坐标系统数值。</li>
+</ul>
+</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter2.html" class="nav-link prev">← 第 2 章：SVG 核心语法：从 XML 到几何表达</a><a href="chapter4.html" class="nav-link next">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md) →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

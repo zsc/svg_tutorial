@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>第 2 章：SVG 核心语法：从 XML 到几何表达</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="2-svg-xml">第 2 章：SVG 核心语法：从 XML 到几何表达</h1>
+<h2 id="1">1. 开篇段落</h2>
+<p>欢迎深入 SVG（Scalable Vector Graphics）的内核。在绝大多数计算机视觉（CV）任务中，图像是像素矩阵（Raster），但在我们的 SVG-MLLM 项目中，<strong>图像是代码</strong>。</p>
+<p>对于人类设计师，SVG 是 Illustrator 或 Figma 画板上的图形；但对于大模型，SVG 首先是一串<strong>文本序列（Sequence of Tokens）</strong>，其次是一棵<strong>结构化树（DOM Tree）</strong>，最后才是通过渲染引擎呈现的<strong>视觉信号</strong>。</p>
+<p>本章的目标不仅仅是教你“怎么写 SVG”，而是教你“如何从机器视角的理解 SVG”。我们需要解构 SVG 如何通过 XML 标签定义画布空间，如何通过数学指令描述几何拓扑，以及这些表达方式对模型训练意味着什么（例如：为什么相对坐标比绝对坐标更有利于模型学习形状的泛化？为什么贝塞尔曲线的控制点预测是生成的难点？）。如果你希望模型能生成可编辑、可渲染、结构合法的矢量图，就必须先掌握这门“几何语言”的语法规则。</p>
+<hr />
+<h2 id="2">2. 文字论述</h2>
+<h3 id="21-svg">2.1 SVG 文档结构：画布、视口与归一化</h3>
+<p>SVG 本质上是一个 XML 文档。对于 MLLM 而言，第一步就是理解“世界在哪里”。</p>
+<h4 id="viewport-viewbox">Viewport（视口）与 ViewBox（可视区）的博弈</h4>
+<p>这是 SVG 中最核心的坐标映射概念，也是数据预处理中最容易出错的环节。</p>
+<ul>
+<li><strong>Viewport (物理窗口)</strong>：通常由 <code>&lt;svg width="800px" height="600px"&gt;</code> 定义。它决定了浏览器或渲染引擎在屏幕上开辟多大的矩形区域。对于模型生成而言，这通常是不重要的，因为矢量图可以无限缩放。</li>
+<li><strong>ViewBox (逻辑世界)</strong>：由 <code>&lt;svg viewBox="min-x min-y width height"&gt;</code> 定义。这是模型真正“生活”的坐标系。</li>
+</ul>
+<p><strong>关键概念：归一化（Normalization）</strong>
+在训练 SVG 模型时，我们通常不希望模型去预测任意范围的浮点数（如 <code>1234.56</code>）。我们希望将所有数值限制在一个固定的范围（如 0-1 或 0-1024）。因此，理解 <code>viewBox</code> 是进行数据清洗的第一步。</p>
+<div class="codehilite"><pre><span></span><code>    [ 浏览器 / 屏幕物理像素区域 (Viewport) ]
+    +-------------------------------------------------------+
+    |  (0,0) 物理原点                                        |
+    |   +-----------------------------------------------+   |
+    |   |  SVG 画布 (viewBox=&quot;0 0 100 100&quot;)              |   |
+
+    |   |  SVG 画布 (viewBox=&quot;0 0 100 100&quot;)              |   |
+    |   |                                               |   |
+    |   |   逻辑坐标 (50, 50) 在这里  --------&gt;  X       |   |
+    |   |   虽然只有 100 单位宽，但它被映射到            |   |
+    |   |   整个屏幕区域。对于模型，它只需输出 50。      |   |
+    |   |                                               |   |
+    |   +-----------------------------------------------+   |
+    |                                                       |
+
+    +-------------------------------------------------------+
+</code></pre></div>
+
+<blockquote>
+<p><strong>Rule-of-Thumb</strong>: 在将 SVG 喂给模型前，务必重写 <code>viewBox</code> 为标准正方形（如 <code>0 0 24 24</code> 或 <code>0 0 1024 1024</code>），并重新缩放内部所有的路径坐标。这能极大降低模型对“空间尺度”的学习负担。</p>
+</blockquote>
+<h3 id="22-primitives">2.2 基本图元 (Primitives)：几何的“高级词汇”</h3>
+<p>SVG 提供了一组预定义的几何形状。虽然它们都可以用 <code>&lt;path&gt;</code> 来表示，但保留图元标签对 MLLM 具有极高的语义价值。</p>
+<ol>
+<li><strong>Rect (矩形)</strong>: <code>&lt;rect x="10" y="10" width="50" height="50" rx="5" /&gt;</code><ul>
+<li><strong>语义</strong>: 模型输出这个标签，意味着它明确知道这是一个“盒子”，且可能有圆角 (<code>rx/ry</code>)。</li>
+</ul>
+</li>
+<li><strong>Circle (圆)</strong>: <code>&lt;circle cx="50" cy="50" r="20" /&gt;</code><ul>
+<li><strong>语义</strong>: 定义圆只需 3 个参数。如果转为 <code>&lt;path&gt;</code>，则需要 4 段贝塞尔曲线（约 24 个参数），不仅序列变长，而且模型很难精确画出完美的圆。</li>
+</ul>
+</li>
+<li><strong>Line / Polyline / Polygon</strong>: 线段与多边形。<ul>
+<li><strong>语义</strong>: <code>polygon</code> 隐含了“闭合”的几何约束，而 <code>polyline</code> 是开放的。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>模型设计决策</strong>: 在构建 Tokenizer 时，是否将 <code>rect</code> 转换为 <code>path</code>？</p>
+<ul>
+<li><strong>转换派</strong>: 统一词表，所有几何都是 path，模型只需学一种语法。</li>
+<li><strong>保留派</strong>: 保留高级语义，生成的 SVG 更容易被人类编辑（Human-readable）。</li>
+<li><strong>结论</strong>: 现代趋势倾向于<strong>保留</strong>。因为这属于“结构化思维”的一部分。</li>
+</ul>
+</blockquote>
+<h3 id="23-path">2.3 <code>&lt;path&gt;</code> 语言：几何的“汇编语言”</h3>
+<p><code>&lt;path&gt;</code> 是 SVG 的灵魂。其 <code>d</code> (data) 属性包含了一套极其紧凑的绘图指令微语言。这是生成式模型最难攻克的部分，因为它是一个<strong>状态机（State Machine）</strong>。</p>
+<h4 id="231-upper-case-vs-lower-case">2.3.1 绝对坐标 (Upper case) vs. 相对坐标 (Lower case)</h4>
+<ul>
+<li><strong>绝对指令 (如 <code>M 100 100 L 200 100</code>)</strong>: 坐标是相对于原点的。<ul>
+<li><em>优点</em>: 即使前面的点预测错了，当前点的位置依然是固定的（误差不累积）。</li>
+<li><em>缺点</em>: 形状与位置强绑定。一个在左上角的正方形和在右下角的正方形，其坐标序列完全不同，模型难以学到“正方形”这个形状的通用表示。</li>
+</ul>
+</li>
+<li><strong>相对指令 (如 <code>m 100 100 l 100 0</code>)</strong>: 坐标是相对于“笔触当前位置”的增量。<ul>
+<li><em>优点</em>: <strong>平移不变性（Translation Invariance）</strong>。无论正方形在哪，画它的指令（<code>l 100 0 l 0 100 l -100 0 z</code>）都是一样的。这极大地帮助了模型的泛化。</li>
+<li><em>缺点</em>: <strong>误差累积</strong>。如果模型在第一步偏了 1 像素，后面所有的点都会偏 1 像素。</li>
+</ul>
+</li>
+</ul>
+<h4 id="232-bezier-curves">2.3.2 贝塞尔曲线 (Bezier Curves) —— 矢量图的基石</h4>
+<p>这是 SVG 生成中最具挑战性的部分。</p>
+<ul>
+<li><strong>三次贝塞尔 (<code>C / c</code>)</strong>: 需要 4 个点：起点（当前笔触）、控制点1、控制点2、终点。<ul>
+<li><strong>直觉</strong>: 想象一条橡皮筋连接起点和终点。控制点1像磁铁一样吸引起点的切线方向，控制点2吸引终点的切线方向。</li>
+</ul>
+</li>
+<li><strong>二次贝塞尔 (<code>Q / q</code>)</strong>: 只有 1 个控制点。计算简单，但表达复杂曲线能力弱。</li>
+<li><strong>平滑连接 (<code>S / s</code>, <code>T / t</code>)</strong>:<ul>
+<li>这是为了保证曲线在连接处<strong>C1 连续（切线平滑）</strong>。</li>
+<li><code>S x2 y2 x y</code>: 这里省略了第一个控制点，它被默认计算为“上一段曲线第二个控制点的中心对称点”。</li>
+<li><strong>MLLM 难点</strong>: <code>S</code> 指令意味着模型不仅要看当前的输入，还要“回忆”起上一段曲线的几何特征。这强依赖于 Transformer 的 Attention 机制。</li>
+</ul>
+</li>
+</ul>
+<div class="codehilite"><pre><span></span><code>       (Start) P0          P1 (Control Point 1)
+              o-----------o
+              |            \
+              |             \      (The Curve)
+              |              \   . . . . . .
+              |               \ .           .
+     Tangent  |                .             .
+     Direction|               .               .
+                              .                o P2 (Control Point 2)
+                             .                /
+                            .                /
+                           o----------------o
+                       (End) P3
+</code></pre></div>
+
+<h4 id="233-a-a">2.3.3 弧线 (<code>A / a</code>) 的噩梦</h4>
+<p><code>A rx ry rot large-arc-flag sweep-flag x y</code>
+弧线指令是参数最多的指令，包含两个布尔标志位（大弧/小弧，顺时针/逆时针）。</p>
+<ul>
+<li><strong>Gotchas</strong>: <code>A</code> 指令非常难以训练。大多数 SVG 深度学习工作（如 DeepSVG, Im2Vec）在预处理阶段都会<strong>将所有 Arc 转换为近似的 Cubic Bezier Curves</strong>。这是一个标准的 Rule-of-Thumb。</li>
+</ul>
+<h3 id="24-coordinate-transforms">2.4 变换系统 (Coordinate Transforms)</h3>
+<p>SVG 允许在组 (<code>&lt;g&gt;</code>) 或元素级别应用变换：<code>translate</code>, <code>scale</code>, <code>rotate</code>, <code>skewX/Y</code>, <code>matrix</code>。</p>
+<ul>
+<li><strong>嵌套问题</strong>: <code>&lt;g transform="rotate(45)"&gt;&lt;rect transform="translate(10,0)" .../&gt;&lt;/g&gt;</code></li>
+<li><strong>模型视角</strong>: 这种嵌套结构要求模型具备极强的空间想象力（执行矩阵乘法）。</li>
+<li><strong>工程策略</strong>: 为了降低学习难度，通常在训练数据预处理（Canonicalization）阶段，将所有变换<strong>展开（Flatten/Bake）</strong>应用到路径本身的坐标点上。<ul>
+<li><em>例外</em>: 如果你的目标是“生成可编辑的 SVG”，那么保持变换结构是有意义的，但这显著增加了难度。</li>
+</ul>
+</li>
+</ul>
+<h3 id="25">2.5 样式系统：几何与视觉的分离</h3>
+<p>SVG 的强大之处在于内容（Path）与表现（Style）的分离。</p>
+<ul>
+<li><strong>Fill (填充)</strong>: 颜色、渐变 (<code>&lt;linearGradient&gt;</code>, <code>&lt;radialGradient&gt;</code>)、图案 (<code>&lt;pattern&gt;</code>)。</li>
+<li><strong>Stroke (描边)</strong>: <code>stroke</code>, <code>stroke-width</code>, <code>stroke-linecap</code> (端点形状), <code>stroke-linejoin</code> (拐角形状), <code>stroke-dasharray</code> (虚线)。</li>
+<li><strong>Fill-Rule (填充规则)</strong>:<ul>
+<li><code>nonzero</code> (默认): 基于射线法和路径方向（顺/逆时针）判定内部。</li>
+<li><code>evenodd</code>: 仅仅计算射线穿过路径的次数，奇数为内，偶数为外。</li>
+<li><strong>陷阱</strong>: 如果模型生成的路径方向（winding order）混乱（一会顺时针一会逆时针），在 <code>nonzero</code> 规则下会出现意想不到的“镂空”或“填实”错误。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3">3. 本章小结</h2>
+<ol>
+<li><strong>代码即图像</strong>: SVG 是通过 XML 文本描述的矢量图。对 MLLM 来说，这是一个序列生成任务。</li>
+<li><strong>空间归一化</strong>: <code>viewBox</code> 是逻辑坐标系，训练前必须将数据归一化到固定范围（如 0-1 或 0-256）。</li>
+<li><strong>Path 是核心</strong>: 理解 <code>M</code>, <code>L</code>, <code>C</code> 指令是理解 SVG 的关键。贝塞尔曲线通过控制点定义形状，这是参数化建模的重点。</li>
+<li><strong>状态机特性</strong>: SVG 解析是上下文相关的（Context-sensitive）。当前点的坐标往往依赖于上一个点（相对坐标）或上一条曲线（S 指令）。</li>
+<li><strong>预处理黄金法则</strong>:<ul>
+<li>将所有非 Path 图元（Rect/Circle）视任务需求决定去留。</li>
+<li>将 <code>Arc</code> 指令近似为 <code>Cubic Bezier</code>。</li>
+<li>将嵌套的 <code>Transform</code> 烘焙进坐标点。</li>
+<li>统一坐标精度（量化）。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="4">4. 练习题</h2>
+<h3 id="_1">基础题 (熟悉材料)</h3>
+<ol>
+<li>
+<p><strong>ViewBox 计算</strong>: 一个 SVG 定义为 <code>&lt;svg width="200" height="200" viewBox="0 0 100 100"&gt;</code>。
+    如果在坐标 <code>(50, 50)</code> 处画一个点，请问它在屏幕上的物理位置是在 SVG 区域的中心，还是右下角？</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>关注 viewBox 的中点是哪里。</details></li>
+<li><details markdown="1"><summary>Answer</summary>中心。逻辑坐标 (50,50) 是 100x100 逻辑空间的中点，映射到物理空间也是中点。</details></li>
+</ul>
+</li>
+<li>
+<p><strong>Path 笔触追踪</strong>: 给定指令序列 <code>M 10 10 h 20 v 20 h -20 z</code> (注意大小写混合)。请描述这是一个什么形状，以及它的各个顶点坐标。</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>h/v 是水平/垂直移动，小写是相对坐标。</details></li>
+<li><details markdown="1"><summary>Answer</summary>这是一个边长为 20 的正方形。顶点依次为：(10,10) -&gt; (30,10) -&gt; (30,30) -&gt; (10,30) -&gt; 回到 (10,10)。</details></li>
+</ul>
+</li>
+<li>
+<p><strong>贝塞尔控制点</strong>: 在指令 <code>C 10 10 90 10 100 0</code> 中，起点是 (0,0)。请问这条曲线在起点的切线斜率大致是多少？</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>起点的切线方向由起点和第一个控制点 (10,10) 决定。</details></li>
+<li><details markdown="1"><summary>Answer</summary>切线方向是 (0,0) 指向 (10,10)，即 45度角，斜率为 1。</details></li>
+</ul>
+</li>
+<li>
+<p><strong>XML 结构</strong>: 写出一个包含红色填充、黑色描边、描边宽度为 2 的圆形的 SVG 代码片段。</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>使用 circle 标签和 style 属性。</details></li>
+<li><details markdown="1"><summary>Answer</summary><code>&lt;circle cx="50" cy="50" r="20" fill="red" stroke="black" stroke-width="2" /&gt;</code></details></li>
+</ul>
+</li>
+</ol>
+<h3 id="_2">挑战题 (开放性思考)</h3>
+<ol start="5">
+<li>
+<p><strong>Transformer 的视野</strong>: 为什么说使用“相对坐标”训练 Transformer 可能比“绝对坐标”更难收敛，但泛化性更好？请从 Attention 机制和误差传播的角度思考。</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>绝对坐标让每个 token 独立对应位置；相对坐标让 token 之间产生强依赖。</details></li>
+<li><details markdown="1"><summary>Answer</summary>使用相对坐标时，第 N 个点的绝对位置依赖于前 N-1 个点的累加和。Transformer 必须学会这种累加运算（这对 Attention 来说并不直观）。一旦序列前部出现预测误差，后续整个形状会“漂移”出画面。但如果学会了，模型就掌握了“形状”本身的特征，而不受位置干扰，从而能画出任何位置的物体。</details></li>
+</ul>
+</li>
+<li>
+<p><strong>S 指令的数学含义</strong>: 如果我们将所有的 <code>S</code> 指令都显式展开为 <code>C</code> 指令（补全那个隐含的控制点），这对模型的训练是有利还是有弊？</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>Token 数量 vs. 推理难度。</details></li>
+<li><details markdown="1"><summary>Answer</summary>有利有弊。弊端是 Token 序列变长了（多了两个坐标数）。利益是消除了“隐式依赖”，模型不需要去计算“中心对称点”，降低了单步推理的数学难度。通常建议展开，让显式信息最大化。</details></li>
+</ul>
+</li>
+<li>
+<p><strong>Tokenization 策略</strong>: 如果画布是 256x256。我们有两个方案：
+    A. 将坐标 <code>128</code> 视为文本 <code>"1", "2", "8"</code> 三个 token。
+    B. 将坐标 <code>128</code> 视为一个整数 token <code>&lt;coord_128&gt;</code>。
+    哪种更适合 SVG 生成？为什么？</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>词表大小 (Vocabulary Size) 和序列长度 (Context Length)。</details></li>
+<li><details markdown="1"><summary>Answer</summary>方案 B (量化/Binning) 通常更好。SVG 坐标是数值意义，而非语义文本。方案 A 让序列变得极长，且模型很难理解 "1" 后面的 "2" 是十位。方案 B 虽然增加了词表大小（如增加 256 个 token），但显著缩短了序列长度，且让模型将位置视为一种分类问题，效果通常优于纯文本回归。</details></li>
+</ul>
+</li>
+<li>
+<p><strong>不可见性问题</strong>: 如果一个 <code>&lt;path&gt;</code> 的 <code>d</code> 属性完全正确，<code>stroke</code> 是 red，<code>stroke-width</code> 是 5，但渲染出来依然什么都没有。除了 <code>opacity</code> 和 <code>display</code>，还有可能是 SVG 的哪个父级属性导致的？</p>
+<ul>
+<li><details markdown="1"><summary>Hint</summary>关于定义的复用。</details></li>
+<li><details markdown="1"><summary>Answer</summary>这个 path 可能被定义在 <code>&lt;defs&gt;</code> 标签内。<code>&lt;defs&gt;</code> 中的元素不会直接渲染，除非被 <code>&lt;use&gt;</code> 引用。</details></li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="5-gotchas">5. 常见陷阱与错误 (Gotchas)</h2>
+<p>在处理 SVG 数据集和构建模型时，以下是 90% 的开发者会踩的坑：</p>
+<ol>
+<li>
+<p><strong>科学计数法的诅咒</strong></p>
+<ul>
+<li><strong>现象</strong>: 解析器崩溃或模型输出乱码。</li>
+<li><strong>原因</strong>: 许多矢量软件（如 Illustrator）会为了压缩体积，将 <code>0.00001</code> 输出为 <code>1e-5</code>。普通的文本 Tokenizer 可能会把它切分成 <code>1</code>, <code>e</code>, <code>-</code>, <code>5</code>，导致模型困惑。</li>
+<li><strong>对策</strong>: 在预处理脚本中，强制将所有科学计数法转换为浮点数或定点小数格式。</li>
+</ul>
+</li>
+<li>
+<p><strong>逗号与空格的随意性</strong></p>
+<ul>
+<li><strong>现象</strong>: 正则表达式无法正确分割坐标。</li>
+<li><strong>原因</strong>: SVG 标准规定，<code>M 10 20</code>，<code>M10,20</code>，<code>M 10, 20</code>，<code>M10.5.5</code>（如果是小数，甚至可以省略空格）都是合法的。</li>
+<li><strong>对策</strong>: 不要自己写 Regex 解析 path string。使用 <code>svgpathtools</code> 或 <code>svgelements</code> 库解析成对象，再重新序列化为标准格式（例如：命令和数字间统一用空格，坐标对间统一用逗号）。</li>
+</ul>
+</li>
+<li>
+<p><strong>隐式 L 指令</strong></p>
+<ul>
+<li><strong>现象</strong>: <code>d="M 10 10 20 20 30 30"</code>。</li>
+<li><strong>原因</strong>: 标准允许在 <code>M</code> 后面跟随多组坐标，后续的坐标会被隐式视为 <code>L</code>（画线）。</li>
+<li><strong>对策</strong>: Canonicalization 必须将隐式指令显式化，变成 <code>M 10 10 L 20 20 L 30 30</code>，否则模型会学到混乱的语法。</li>
+</ul>
+</li>
+<li>
+<p><strong>Z 指令后的位移</strong></p>
+<ul>
+<li><strong>现象</strong>: 路径闭合后，下一条指令也是画线，结果飞线了。</li>
+<li><strong>原因</strong>: <code>Z</code> 指令会将“当前点”重置为子路径的起点。如果在 <code>Z</code> 之后紧跟相对坐标指令（如 <code>l 10 10</code>），它是基于起点的位移，而不是基于 Z 之前的点的位移。</li>
+</ul>
+</li>
+<li>
+<p><strong>Fill-Rule 的默认值陷阱</strong></p>
+<ul>
+<li><strong>现象</strong>: 环形图标（Donut shape）中间的洞被填满了。</li>
+<li><strong>原因</strong>: SVG 默认 <code>fill-rule="nonzero"</code>。如果你的数据集中包含大量依靠 <code>evenodd</code> 渲染的图标，但你没有显式把这个属性喂给模型，模型默认用 nonzero 渲染就会出错。</li>
+<li><strong>对策</strong>: 尽可能在数据清洗阶段，利用布尔运算库（如 Skia PathOps）将 <code>evenodd</code> 的路径转换为几何上等价的 <code>nonzero</code> 路径（通常涉及改变内孔洞的绕转方向）。</li>
+</ul>
+</li>
+</ol>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter1.html" class="nav-link prev">← 第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</a><a href="chapter3.html" class="nav-link next">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同 →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

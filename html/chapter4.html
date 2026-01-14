@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">SVG-MLLM：基于 SVG 的多模理解生成一体化大模型（中文教程）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 1 章：从 SVG 到 SVG-MLLM：问题定义与路线图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 2 章：SVG 核心语法：从 XML 到几何表达</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐](chapter4.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md)</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 6 章：SVG 结构化表示：从文本到 Token / AST / 图</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 7 章：渲染引擎与训练闭环：resvg 与 PyTorch-SVGRender</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 8 章：DeepSVG：学习式 SVG 表示与生成基线</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 9 章：从 Stroke 到 Path：Sketch 系列思想与贝塞尔生成</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 11 章：SVG-MLLM 架构设计：理解与生成一体化</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">第 12 章：训练流程：预训练、指令微调、偏好对齐与有效性保障</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Untitled</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="4-web-svg"><a href="chapter4.html">第 4 章：Web SVG 数据工程：采集、清洗、规范化与对齐</a></h1>
+<h2 id="1">1. 开篇段落</h2>
+<p>在多模态大模型（MLLM）的训练中，数据不仅决定了模型能力的上限，更决定了模型的“思维方式”。对于 SVG 这种特殊的模态——它既是<strong>视觉图像</strong>，又是<strong>代码文本</strong>（XML）——数据工程的复杂度远超纯文本或纯像素图像。</p>
+<p>互联网（Common Crawl, GitHub, Icon Repositories）是最大的 SVG 矿藏，但它同时也是一个充斥着冗余代码、无效引用和非标准语法的沼泽。一个视觉上是圆形的图案，在 SVG 源码中可能被写作 <code>&lt;circle&gt;</code>，也可能是 <code>&lt;path&gt;</code>，甚至可能是一个应用了极坐标变换的 <code>&lt;rect&gt;</code>。如果你直接将原始 Web SVG 喂给模型，模型将不得不浪费大量参数去记忆 XML 的千奇百怪的写法，而不是学习图形的几何本质。</p>
+<p>本章将带你构建一条完整的 <strong>ETL（Extract, Transform, Load）流水线</strong>。我们将深入探讨如何从 HTML 废墟中挖掘 SVG，如何通过<strong>规范化（Canonicalization）</strong>将 SVG 的“熵”降到最低，如何处理复杂的 CSS 依赖，以及如何利用现有的 VLM（视觉大模型）生成高质量的<strong>合成文本对齐数据</strong>。完成本章后，你将拥有构建一个百万级高质量 SVG-Text 配对数据集的能力。</p>
+<hr />
+<h2 id="2">2. 核心论述</h2>
+<h3 id="21-svg">2.1 数据源与采集策略：SVG 的三种“栖息形态”</h3>
+<p>网页中的 SVG 并非总是以 <code>.svg</code> 文件的形式存在。为了最大化数据量，我们需要针对三种形态制定不同的采集策略：</p>
+<h4 id="a-external-files">A. 独立文件（External Files）</h4>
+<p>这是最容易采集的形式，通常通过 <code>&lt;img src="icon.svg"&gt;</code> 或 <code>&lt;object data="graph.svg"&gt;</code> 引用。</p>
+<ul>
+<li><strong>优点</strong>：结构通常是完整的 XML 文档，自带 <code>&lt;?xml ...?&gt;</code> 头。</li>
+<li><strong>缺点</strong>：严重缺乏上下文。文件名可能是唯一的文本线索（如 <code>asset_42.svg</code>，毫无意义）。</li>
+<li><strong>策略</strong>：爬取时必须同时保存引用该文件的 <code>alt</code> 属性、周边 <code>&lt;caption&gt;</code> 或父级 <code>&lt;div&gt;</code> 的文本，作为元数据。</li>
+</ul>
+<h4 id="b-svginline-svg">B. 内联 SVG（Inline SVG）</h4>
+<p>直接嵌入在 HTML DOM 树中的 <code>&lt;svg&gt;...&lt;/svg&gt;</code> 代码块。</p>
+<ul>
+<li><strong>优点</strong>：拥有最丰富的上下文（网页标题、段落文本）。</li>
+<li><strong>缺点</strong>：<strong>污染严重</strong>。通常充斥着大量的 <code>class="css-xyz"</code>，且高度依赖外部 CSS 渲染颜色。</li>
+<li><strong>策略</strong>：提取时需连带解析计算后的 CSS 样式（Computed Styles），将其固化为行内属性（例如将 <code>.cls-1 { fill: red }</code> 转换为 <code>fill="red"</code>），否则提取出的 SVG 往往是一片漆黑。</li>
+</ul>
+<h4 id="c-sprites-symbol-systems">C. 图标精灵与符号系统（Sprites &amp; Symbol Systems）</h4>
+<p>这是现代前端开发的常见模式。一个 SVG 文件作为一个“容器”，内部包含数十个 <code>&lt;symbol id="icon-user"&gt;</code>，页面通过 <code>&lt;use xlink:href="#icon-user"&gt;</code> 来显示。</p>
+<ul>
+<li><strong>优点</strong>：<strong>数据密度极高</strong>，通常是经过专业设计师优化的图标，拓扑结构极其规范。</li>
+<li><strong>挑战</strong>：需要编写专门的“解包器（Unpacker）”。</li>
+<li><strong>策略</strong>：将每个 <code>&lt;symbol&gt;</code> 提取出来，包裹上 <code>&lt;svg&gt;</code> 根标签，并将原容器 <code>&lt;defs&gt;</code> 中的公共资源（如渐变、滤镜）复制到新文件中，形成独立的训练样本。</li>
+</ul>
+<div class="codehilite"><pre><span></span><code>[ 采集难度分级 ]
+Easy:   .svg 文件下载
+Medium: &lt;symbol&gt; 解包与资源依赖解析
+Hard:   Inline SVG 的 CSS 样式计算与属性内联
+</code></pre></div>
+
+<h3 id="22-sanitization-svg">2.2 清洗（Sanitization）：剔除“伪 SVG”与风险</h3>
+<p>并不是所有 <code>&lt;svg&gt;</code> 标签里的内容都是我们想要的。在进入模型之前，必须进行严格的清洗。</p>
+<ul>
+<li>
+<p><strong>剔除 Base64 位图（The Raster Trap）</strong>：
+    这是 SVG 数据集最大的污染源。很多设计工具导出 SVG 时，如果遇到无法矢量化的特效，会直接截图并在 SVG 里插入 <code>&lt;image href="data:image/png;base64..." /&gt;</code>。</p>
+<ul>
+<li><em>Rule-of-Thumb</em>：解析 XML，计算 <code>&lt;image&gt;</code> 标签覆盖的面积。如果 <code>&lt;image&gt;</code> 面积超过 ViewBox 的 80%，或者文件体积的 90% 都是 Base64 字符串，直接丢弃。这是“伪 SVG”。</li>
+</ul>
+</li>
+<li>
+<p><strong>安全清洗</strong>：
+    SVG 是 XML，支持脚本。必须移除所有 <code>&lt;script&gt;</code> 标签、<code>onclick</code>/<code>onload</code> 等事件属性。这不仅是为了安全，也是因为生成模型不需要学习交互逻辑。</p>
+</li>
+<li>
+<p><strong>元数据剥离</strong>：
+    移除 <code>xmlns:inkscape</code>、<code>adobe:save-meta</code> 等编辑器私有数据。移除 <code>data-*</code> 属性。移除注释 <code>&lt;!-- ... --&gt;</code>。这些不仅消耗 Token，还可能让模型过拟合到特定的编辑器特征上。</p>
+</li>
+</ul>
+<h3 id="23-canonicalization">2.3 规范化（Canonicalization）：降低几何熵</h3>
+<p>这是本章<strong>最核心</strong>的技术点。规范化的目标是：<strong>对于同样的视觉输出，强制模型只看到一种标准的代码表达。</strong></p>
+<h4 id="1-viewbox-normalization">1. 视口归一化（ViewBox Normalization）</h4>
+<p>不同 SVG 的坐标系千差万别。有的 ViewBox 是 <code>0 0 24 24</code>，有的是 <code>0 0 1024 768</code>，有的是 <code>-50 -50 100 100</code>。</p>
+<ul>
+<li><strong>操作</strong>：将所有 SVG 的坐标重映射到一个标准化的正方形空间（例如 <code>0 0 256 256</code>）。</li>
+<li><strong>保留纵横比</strong>：如果原图是长方形，保持长边为 256，短边居中，通过 <code>padding</code> 填充。</li>
+</ul>
+<h4 id="2-transform-flattening-baking">2. 变换扁平化（Transform Flattening / Baking）</h4>
+<p>SVG 允许在 Group (<code>&lt;g&gt;</code>) 或 Path 上应用 <code>transform="translate(x,y) rotate(a) scale(s)"</code>。这对模型理解几何极其不友好（模型需要在大脑中进行矩阵乘法才能知道线条真正画在哪里）。</p>
+<ul>
+<li><strong>操作</strong>：遍历 DOM 树，将所有父级节点的变换矩阵<strong>累乘</strong>，并应用到叶子节点（Path）的每一个控制点坐标上。最后移除所有 <code>transform</code> 属性。</li>
+<li><strong>结果</strong>：模型看到的坐标就是最终渲染的屏幕坐标。</li>
+</ul>
+<h4 id="3-primitive-to-path">3. 图元统一化（Primitive to Path）</h4>
+<p>SVG 有 <code>&lt;rect&gt;</code>, <code>&lt;circle&gt;</code>, <code>&lt;ellipse&gt;</code>, <code>&lt;line&gt;</code>, <code>&lt;polyline&gt;</code>, <code>&lt;polygon&gt;</code> 等基础形状。</p>
+<ul>
+<li><strong>操作</strong>：全部转换为 <code>&lt;path d="..."&gt;</code>。</li>
+<li><strong>理由</strong>：将词表（Vocabulary）压缩到极致。模型只需要学会 M, L, C, Z 等路径指令，而不需要单独学习“矩形”的概念（矩形只是 Path 的一种特例）。</li>
+</ul>
+<h4 id="4">4. 数值精度截断</h4>
+<p>SVG 编辑器经常生成 <code>10.0000000001</code> 这样的坐标。</p>
+<ul>
+<li><strong>操作</strong>：保留 1 位或 2 位小数（例如 <code>10.0</code>），甚至在 256x256 的尺度下直接取整。这能显著减少 Token 长度，且肉眼几乎不可见差异。</li>
+</ul>
+<h3 id="24-tokenization">2.4 结构化表示与 Tokenization 预备</h3>
+<p>在文本层面，SVG 是一长串字符。但在模型眼中，它应该是一串<strong>结构化的 Token</strong>。</p>
+<ul>
+<li>
+<p><strong>命令与参数分离</strong>：
+    原始：<code>M10 20L30 40</code>
+    处理后：<code>&lt;M&gt; &lt;10&gt; &lt;20&gt; &lt;L&gt; &lt;30&gt; &lt;40&gt;</code>
+    建议在清洗阶段就在数字和命令之间插入空格，方便 BPE（Byte Pair Encoding）分词器处理。</p>
+</li>
+<li>
+<p><strong>相对坐标 vs 绝对坐标</strong>：</p>
+<ul>
+<li><em>绝对坐标（M, L, C）</em>：每个点都是画布上的真实位置。<strong>推荐用于生成模型</strong>，因为具有全局位置感知能力，不容易“画飞”。</li>
+<li><em>相对坐标（m, l, c）</em>：每个点是相对于前一个点的偏移。适合压缩，但容易累积误差。</li>
+<li><em>建议</em>：在规范化阶段，统一转换为<strong>绝对坐标</strong>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="25-alignment">2.5 文本对齐（Alignment）：如何让模型“看懂”图</h3>
+<p>有了干净的 SVG 代码，我们还需要配对的文本（Prompt）。Web 数据的天然文本质量极差，我们需要多层次的对齐策略：</p>
+<p>| 来源 | 质量 | 数量 | 描述 |</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">来源</th>
+<th style="text-align: left;">质量</th>
+<th style="text-align: left;">数量</th>
+<th style="text-align: left;">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Alt / Title</strong></td>
+<td style="text-align: left;">低</td>
+<td style="text-align: left;">极大</td>
+<td style="text-align: left;">只有关键词，如 "search icon"。适合做 Keyword-to-SVG。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Surrounding Text</strong></td>
+<td style="text-align: left;">中</td>
+<td style="text-align: left;">大</td>
+<td style="text-align: left;">网页正文。噪音大，需用 NLP 提取关键词。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>OCR / Detection</strong></td>
+<td style="text-align: left;">高</td>
+<td style="text-align: left;">中</td>
+<td style="text-align: left;">对 SVG 渲染图运行 OCR，提取图中的文字，作为文本提示的一部分。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>合成数据 (Synthetic)</strong></td>
+<td style="text-align: left;"><strong>极高</strong></td>
+<td style="text-align: left;">需计算成本</td>
+<td style="text-align: left;"><strong>这是 SOTA 的关键。</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>合成数据流水线（The Synthetic Pipeline）：</strong></p>
+<ol>
+<li>使用渲染引擎（resvg）将清洗后的 SVG 渲染为 PNG。</li>
+<li>将 PNG 输入给 GPT-4V / Gemini Pro Vision / Claude 3.5 Sonnet。</li>
+<li>Prompt 设计：<ul>
+<li>"描述这个图标的视觉外观、几何形状和颜色。" (Captioning)</li>
+<li>"这段 SVG 代码对应什么功能？" (Code Understanding)</li>
+<li>"将图中的红色圆改为蓝色方块，你会怎么做？" (Editing Instruction)</li>
+</ul>
+</li>
+<li>将 VLM 生成的高质量描述与 SVG 代码配对，作为核心训练数据。</li>
+</ol>
+<h3 id="26-anti-leakage">2.6 数据集切分与防泄漏（Anti-Leakage）</h3>
+<p>SVG 数据存在严重的<strong>同源相似性</strong>。一个网站的 50 个图标通常由同一个设计师用同一种风格绘制。</p>
+<ul>
+<li><strong>错误的切分</strong>：随机 Shuffle 后切分 Train/Test。<ul>
+<li><em>后果</em>：Train 集里有“首页图标”，Test 集里有“用户页图标”。两者风格、笔触、代码结构完全一致。模型在 Test 集上分数极高，但实际泛化能力极差。</li>
+</ul>
+</li>
+<li><strong>正确的切分</strong>：<strong>Group by Domain</strong>。<ul>
+<li>来自 <code>github.com</code> 的所有 SVG 都在训练集。</li>
+<li>来自 <code>twitter.com</code> 的所有 SVG 都在测试集。</li>
+<li>这样才能评估模型对“未见过的设计风格”的泛化能力。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3">3. 本章小结</h2>
+<ul>
+<li><strong>ETL 决定成败</strong>：不要低估清洗脚本的重要性。一个处理了 transform flatten 和 CSS injection 的脚本，价值胜过单纯的模型架构调整。</li>
+<li><strong>规范化即压缩</strong>：通过 Shape-to-Path 和坐标归一化，我们人为地缩小了假设空间，让模型更容易捕捉图形规律。</li>
+<li><strong>合成数据是杠杆</strong>：利用强 VLM 进行 Re-captioning，是从“大量垃圾数据”中提炼“高质量对齐数据”的最有效手段。</li>
+<li><strong>拒绝伪矢量</strong>：时刻警惕 Base64 这种“披着 SVG 皮的 JPEG”，它们会破坏生成模型的训练稳定性。</li>
+</ul>
+<hr />
+<h2 id="4_1">4. 练习题</h2>
+<h3 id="_1">基础题（热身与巩固）</h3>
+<ol>
+<li>
+<p><strong>[转换逻辑]</strong> 给定一个 SVG <code>&lt;rect x="10" y="20" width="50" height="30" /&gt;</code>。请写出将其转换为 <code>&lt;path d="..."&gt;</code> 后的指令序列。
+    <details markdown="1"><summary>Hint</summary>M (x) (y) -&gt; H (x+w) -&gt; V (y+h) -&gt; H (x) -&gt; Z。注意起点和方向。</details></p>
+</li>
+<li>
+<p><strong>[坐标归一化]</strong> 一个 SVG 的 <code>viewBox="0 0 100 50"</code>。如果我们要将其归一化到 <code>256 x 256</code> 的正方形画布中并保持居中，原始坐标 <code>(50, 25)</code> 在新画布中的坐标应该是多少？
+    <details markdown="1"><summary>Hint</summary>计算缩放比例 s = 256/100 = 2.56。Y 轴需要 padding。新 Y = (256 - 50<em>2.56)/2 + 25</em>2.56。</details></p>
+</li>
+<li>
+<p><strong>[数据筛选]</strong> 你编写了一个爬虫，抓到了以下三个 SVG 文件，请判断哪些应该保留，哪些应该丢弃，并说明理由：</p>
+<ul>
+<li>A. 文件大小 2KB，包含 5 个 path，无 image 标签。</li>
+<li>B. 文件大小 500KB，包含 1 个 image 标签，href 为 base64 编码，无 path。</li>
+<li>C. 文件大小 5KB，包含 <code>&lt;script&gt;alert('xss')&lt;/script&gt;</code> 和正常的图形数据。
+<details markdown="1"><summary>Hint</summary>A 保留。B 丢弃（伪 SVG）。C 清洗后保留。</details></li>
+</ul>
+</li>
+<li>
+<p><strong>[文本处理]</strong> 很多从网页提取的 SVG 文件名是 <code>icon_v2_final_final.svg</code>。设计一个简单的正则表达式或逻辑，将其转化为可用的文本标签。
+    <details markdown="1"><summary>Hint</summary>去扩展名 -&gt; 替换下划线/横杠为空格 -&gt; 去除 v2/final 等无意义词 -&gt; "icon"。</details></p>
+</li>
+</ol>
+<h3 id="_2">挑战题（深入思考）</h3>
+<ol start="5">
+<li><strong>[算法设计]</strong> <strong>Transform Flattening</strong>。给定一个嵌套结构：</li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;g</span><span class="w"> </span><span class="na">transform=</span><span class="s">&quot;translate(10, 10)&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;g</span><span class="w"> </span><span class="na">transform=</span><span class="s">&quot;scale(2)&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;path</span><span class="w"> </span><span class="na">d=</span><span class="s">&quot;M 0 0 L 10 0&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/g&gt;</span>
+<span class="nt">&lt;/g&gt;</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code>请描述如何通过矩阵运算，计算出<span class="w"> </span>path<span class="w"> </span>最终的绝对坐标。
+<span class="nt">&lt;details</span><span class="w"> </span><span class="na">markdown=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;&lt;summary&gt;</span>Hint<span class="nt">&lt;/summary&gt;</span>构建变换矩阵<span class="w"> </span>M1<span class="w"> </span>(translate),<span class="w"> </span>M2<span class="w"> </span>(scale)。总矩阵<span class="w"> </span>M<span class="w"> </span>=<span class="w"> </span>M1<span class="w"> </span>*<span class="w"> </span>M2。对点<span class="w"> </span>(0,0)<span class="w"> </span>和<span class="w"> </span>(10,0)<span class="w"> </span>应用<span class="w"> </span>M。<span class="nt">&lt;/details&gt;</span>
+</code></pre></div>
+
+<ol start="6">
+<li>
+<p><strong>[场景分析]</strong> 在处理包含文本的 SVG（<code>&lt;text&gt;Hello&lt;/text&gt;</code>）时，我们面临一个两难选择：是保留 <code>&lt;text&gt;</code> 标签让模型学习排版，还是将其转换为轮廓（Outline/Path）？请分析这两种策略在 MLLM 训练中的优缺点。
+    <details markdown="1"><summary>Hint</summary>保留标签：模型能修改文字内容，但渲染一致性难保证（缺字体）。转轮廓：渲染绝对一致，但失去了“修改文字内容”的语义编辑能力。</details></p>
+</li>
+<li>
+<p><strong>[架构思考]</strong> 假设你的资源有限，无法对百万级 SVG 全部跑一遍 GPT-4V 做合成标注。你如何设计一个<strong>主动学习（Active Learning）</strong>策略，挑选出最值得标注的那 10% 数据？
+    <details markdown="1"><summary>Hint</summary>多样性采样（聚类中心）+ 复杂度适中（过滤太简单和太复杂的）+ 原始文本缺失最严重的。</details></p>
+</li>
+</ol>
+<hr />
+<h2 id="5-gotchas">5. 常见陷阱与错误 (Gotchas)</h2>
+<ul>
+<li>
+<p><strong>陷阱 1：被忽视的 <code>defs</code> 与 <code>use</code></strong></p>
+<ul>
+<li><em>现象</em>：解析 <code>&lt;path&gt;</code> 时一切正常，但渲染出来缺少部分图形。</li>
+<li><em>原因</em>：很多重复图形定义在 <code>&lt;defs&gt;</code> 里，通过 <code>&lt;use&gt;</code> 引用。如果不解析 <code>&lt;use&gt;</code> 标签并将其展开（Instantiate），你的数据集就是残缺的。</li>
+<li><em>对策</em>：必须实现 <code>use</code> 节点的递归展开逻辑，将引用的图形实体化到当前位置。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 2：Wind-rule 的噩梦（Non-zero vs Even-odd）</strong></p>
+<ul>
+<li><em>现象</em>：模型生成的图标在某些区域填充颜色反了，原本该空心的地方实心了。</li>
+<li><em>原因</em>：SVG 的 <code>fill-rule</code> 属性决定了复杂路径的内部填充逻辑。如果规范化时丢失了这个属性，或者混合了不同 fill-rule 的路径。</li>
+<li><em>对策</em>：尽量将所有路径通过几何算法统一转换为 <code>nonzero</code> 规则，或者在模型输入中显式包含 <code>fill-rule</code> token。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 3：CSS <code>currentColor</code></strong></p>
+<ul>
+<li><em>现象</em>：图标全是黑色的。</li>
+<li><em>原因</em>：许多图标设置 <code>fill="currentColor"</code>，这是为了让图标颜色跟随父级文字颜色。在独立提取时，<code>currentColor</code> 默认解析为黑。</li>
+<li><em>对策</em>：在清洗阶段，将 <code>currentColor</code> 替换为一个随机深色或标准黑色，或者保留该 Token 作为一个特殊的可控变量。</li>
+</ul>
+</li>
+<li>
+<p><strong>陷阱 4：XML 解析器的宽容度</strong></p>
+<ul>
+<li><em>现象</em>：Python 的 XML 库报错崩溃，导致整个 batch 失败。</li>
+<li><em>原因</em>：网页 SVG 常包含未闭合标签或非法属性，浏览器能容忍，但严谨的 Parser 不能。</li>
+<li><em>对策</em>：使用 <code>lxml</code> 的 <code>recover=True</code> 模式，或者在使用 Parser 前先用正则进行“脏修复”。对于无法修复的坏文件，直接 <code>try-catch</code> 丢弃，<strong>千万不要让脏数据中断数据处理流水线</strong>。</li>
+</ul>
+</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter3.html" class="nav-link prev">← 第 3 章：SVG 与 Web 联动：DOM、CSS、JS 与 three.js 协同</a><a href="chapter5.html" class="nav-link next">[第 5 章：传统矢量化与图像追踪（Image Tracing）算法](chapter5.md) →</a></nav>
+        </main>
+    </div>
+</body>
+</html>
